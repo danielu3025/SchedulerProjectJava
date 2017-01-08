@@ -81,6 +81,7 @@ class ClassRoom extends JFrame {
     }
     private static void makeClassArr(ResultSet r){
         try {
+            array = new ArrayList<>();
             while (r.next()){
                 System.out.println(r.getString("CLASS"));
                 System.out.println(r.getString("FLOOR"));
@@ -100,14 +101,30 @@ class ClassRoom extends JFrame {
         makeClassArr(result);
         if(array.size() == 0) {
             PreparedStatement deleted = con.prepareStatement("DELETE  FROM CLASS_TABLE WHERE CLASS=" + n);
-            deleted.executeLargeUpdate();
+            long t = deleted.executeLargeUpdate();
+            if (t>0)
+                System.out.println("row deleted");
+             else
+                 System.out.println("row didn't found");
         }else
             System.out.println("can't delete class which have course attached");
+            //need to delete first from Collage table
     }
 
     private static void updateClass(String b, String n, String f) throws Exception {
-        PreparedStatement updated = con.prepareStatement("UPDATE CLASS_TABLE SET FLOOR="+ f +",BUILDING="+ b +" WHERE CLASS="+ n);
-        updated.executeLargeUpdate();
+        PreparedStatement searched = con.prepareStatement("SELECT * FROM COLLAGE_TABLE WHERE CLASS="+ n);
+        ResultSet result = searched.executeQuery();
+        makeClassArr(result);
+        if(array.size() == 0) {
+            PreparedStatement updated = con.prepareStatement("UPDATE CLASS_TABLE SET FLOOR="+ f +",BUILDING="+ b +" WHERE CLASS="+ n);
+            long t = updated.executeLargeUpdate();
+            if (t>0)
+                System.out.println("row updated");
+             else
+                System.out.println("row didn't found");
+        } else
+            System.out.println("can't update class which have course attached");
+        //need to update collage table first
     }
     public class ButtonClickListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {

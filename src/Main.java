@@ -6,9 +6,9 @@ public class Main{
     public static void main(String[] args) throws Exception {
         connect();
         if(con != null) {
-            //ClassRoom g = new ClassRoom(con);
+            ClassRoom g = new ClassRoom(con);
             //Lecturer l = new Lecturer(con);
-            Cours c = new Cours(con);
+            //Cours c = new Cours(con);
         }
     }
     private static void connect() throws Exception {
@@ -21,7 +21,7 @@ public class Main{
             Class.forName(driver);
 
             con = DriverManager.getConnection(url, userName, password);
-            System.out.println("connected secseed");
+            System.out.println("connected succeed");
         } catch (Exception e) {
             System.out.println(e);
         }
