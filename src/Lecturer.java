@@ -3,23 +3,26 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 
 public class Lecturer  extends JFrame{
-    JTextField number;
-    JTextField building;
-    JTextField floor;
+    JTextField id;
+    JTextField name;
+    JTextField lastName;
+    JTextField dob;
+    JTextField address;
     JButton addb,search,delte ,updateb;
-    ArrayList<String> vals = new ArrayList<String>();
+    ArrayList<String> vals = new ArrayList<>();
     public  static Connection conn;
 
     public Lecturer() throws HeadlessException {
-        number = new JTextField("class numbr",20);
-        building = new JTextField("class building",20);
-        floor = new JTextField("class floor",20);
+        id = new JTextField("lecturer id",20);
+        name = new JTextField("name",20);
+        lastName = new JTextField("last name",20);
+        dob = new JTextField("date of birth",20);
+        address = new JTextField("address",20);
         addb = new JButton("add");
         search = new JButton("search");
         delte = new JButton("delete");
@@ -39,17 +42,19 @@ public class Lecturer  extends JFrame{
 
         setSize(500,500);
         setTitle("Class");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        number.setBounds(30,10,100,20);
-        building.setBounds(30,40,100,20);
-        floor.setBounds(30,70,100,20);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        id.setBounds(30,10,100,20);
+        name.setBounds(30,40,100,20);
+        lastName.setBounds(30,70,100,20);
+        dob.setBounds(30,100,100,20);
+        address.setBounds(30,130,100,20);
         addb.setBounds(30,100,100,20);
         search.setBounds(160,100,100,20);
         delte.setBounds(280,100,100,20);
         updateb.setBounds(30,130,100,20);
 
 
-        add(number);add(building);add(floor);add(addb);add(search);add(delte);add(updateb);
+        add(id);add(name);add(lastName);add(dob);add(address);add(addb);add(search);add(delte);add(updateb);
         setLayout(new BorderLayout());
         setResizable(false);
         setLayout(new FlowLayout());
@@ -58,51 +63,33 @@ public class Lecturer  extends JFrame{
 
     }
     public  void clear(){
-        number.setText("");building.setText("");floor.setText("");
+        id.setText("");name.setText("");lastName.setText("");dob.setText("");address.setText("");
     }
-    public static Connection getConnection() throws Exception {
+    public static void updateLect(String id, String name , String lastName, String dob, String address) throws Exception{
         try {
-            String driver = "com.mysql.jdbc.Driver";
-            String url = "jdbc:mysql://localhost:8889/schedulerDB";
-            String userName = "root";
-            String password = "root";
-            Class.forName(driver);
-
-            conn = DriverManager.getConnection(url, userName, password);
-            System.out.println("connected secseed");
-            return conn;
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-        return null;
-    }
-    public static void postclass(String b, String n , String f) throws Exception{
-        String var1 = n;
-        String var2 = b;
-        String var3 = f;
-        try {
-            Connection con = getConnection();
-            PreparedStatement posted = con.prepareStatement("INSERT INTO CLASS_TABLE (BUILDING, CLASS, FLOOR) VALUES ('"+var2+"', '"+var1+"', '"+var3+"')");
+            PreparedStatement posted = conn.prepareStatement("INSERT INTO LECTURERS_TABLE (ID, NAME, LAST_NAME, DOB, ADDRESS) VALUES ('"+ id +"', '"+ name +"', '"+ lastName +"', '"+ dob +"', '"+ address +"')");
             posted.executeLargeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    public static ArrayList<String>searchClass(String n) throws Exception {
-        String var1 = n;
+    public static ArrayList<String>searchClass(String id) throws Exception {
         try {
-            Connection con = getConnection();
-            PreparedStatement searched = con.prepareStatement("SELECT * FROM CLASS_TABLE WHERE CLASS="+var1);
+            PreparedStatement searched = conn.prepareStatement("SELECT * FROM LECTURERS_TABLE WHERE ID="+id);
             ResultSet result = searched.executeQuery();
             ArrayList<String> array = new ArrayList<String>();
             while (result.next()){
-                System.out.println(result.getString("CLASS"));
-                System.out.println(result.getString("FLOOR"));
-                System.out.println(result.getString("BUILDING"));
+                System.out.println(result.getString("ID"));
+                System.out.println(result.getString("NAME"));
+                System.out.println(result.getString("LAST_NAME"));
+                System.out.println(result.getString("DOB"));
+                System.out.println(result.getString("ADDRESS"));
 
-                array.add(result.getString("ClASS"));
-                array.add(result.getString("FLOOR"));
-                array.add(result.getString("BUILDING"));
+                array.add(result.getString("ID"));
+                array.add(result.getString("NAME"));
+                array.add(result.getString("LAST_NAME"));
+                array.add(result.getString("DOB"));
+                array.add(result.getString("ADDRESS"));
             }
             System.out.println("all records selected");
             return array;
@@ -111,19 +98,13 @@ public class Lecturer  extends JFrame{
         }
         return null;
     }
-    public static void deleteClass(String n) throws Exception {
-        String var1 = n;
-        Connection con = getConnection();
-        PreparedStatement deleted = con.prepareStatement("DELETE  FROM CLASS_TABLE WHERE CLASS="+var1);
+    public static void deleteClass(String id) throws Exception {
+        PreparedStatement deleted = conn.prepareStatement("DELETE  FROM LECTURER_TABLE WHERE ID="+id);
         deleted.executeLargeUpdate();
     }
 
-    public static void updateClass(String b, String n , String f) throws Exception {
-        String var1 = n;
-        String var2 = b;
-        String var3 = f;
-        Connection con = getConnection();
-        PreparedStatement updated = con.prepareStatement("UPDATE CLASS_TABLE SET FLOOR="+var3+",BUILDING="+var2+" WHERE CLASS="+var1);
+    public static void updateClass(String id, String name , String lastName, String dob, String address) throws Exception {
+        PreparedStatement updated = conn.prepareStatement("UPDATE LECTURER_TABLE SET ID="+id+",NAME="+name+",LAST_NAME="+lastName+",DOB="+dob+",ADDRESS="+address+" WHERE ID="+id);
         updated.executeLargeUpdate();
     }
     private class ButtonClickListener implements ActionListener {
@@ -131,7 +112,7 @@ public class Lecturer  extends JFrame{
             String command = e.getActionCommand();
             if( command.equals( "add"))  {
                 try {
-                    postclass(building.getText(),number.getText(),floor.getText());
+                    updateLect(id.getText(),name.getText(),lastName.getText(),dob.getText(),address.getText());
                     clear();
                 } catch (Exception e1) {
                     e1.printStackTrace();
@@ -139,16 +120,16 @@ public class Lecturer  extends JFrame{
             }
             else if( command.equals( "search" ) )  {
                 try {
-                    vals = searchClass(number.getText());
+                    vals = searchClass(id.getText());
 
                 } catch (Exception e1) {
                     e1.printStackTrace();
                 }
-                number.setText(vals.get(0));building.setText(vals.get(1));floor.setText(vals.get(2));
+                id.setText(vals.get(0));name.setText(vals.get(1));lastName.setText(vals.get(2));dob.setText(vals.get(3));address.setText(vals.get(4));
             }
             else  if (command.equals("delete")){
                 try {
-                    deleteClass(number.getText());
+                    deleteClass(id.getText());
                     clear();
                 } catch (Exception e1) {
                     e1.printStackTrace();
@@ -157,7 +138,7 @@ public class Lecturer  extends JFrame{
             }
             else if (command.equals("update")){
                 try {
-                    updateClass(building.getText(),number.getText(),floor.getText());
+                    updateClass(id.getText(),name.getText(),lastName.getText(),dob.getText(),address.getText());
                     clear();
                 } catch (Exception e1) {
                     e1.printStackTrace();

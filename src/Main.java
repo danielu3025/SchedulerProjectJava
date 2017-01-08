@@ -6,7 +6,8 @@ public class Main{
     public static void main(String[] args) throws Exception {
         connect();
         if(con != null) {
-            ClassRoom g = new ClassRoom(con);
+            //ClassRoom g = new ClassRoom(con);
+            Lecturer l = new Lecturer();
         }
     }
     private static void connect() throws Exception {
