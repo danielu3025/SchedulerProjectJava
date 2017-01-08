@@ -7,13 +7,13 @@ public class Main{
         connect();
         if(con != null) {
             //ClassRoom g = new ClassRoom(con);
-            Lecturer l = new Lecturer();
+            Lecturer l = new Lecturer(con);
         }
     }
     private static void connect() throws Exception {
         try {
             String driver = "com.mysql.jdbc.Driver";
-            //String url = "jdbc:mysql://localhost:8080/schedulerDB";
+            //String url = "jdbc:mysql://localhost:8889/schedulerDB";
             String url = "jdbc:mysql://localhost:3306/schedulerDB";
             String userName = "root";
             String password = "root";

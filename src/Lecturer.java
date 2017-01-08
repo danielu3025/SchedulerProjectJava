@@ -17,7 +17,8 @@ public class Lecturer  extends JFrame{
     ArrayList<String> vals = new ArrayList<>();
     public  static Connection conn;
 
-    public Lecturer() throws HeadlessException {
+    public Lecturer(Connection con) throws HeadlessException {
+        conn = con;
         id = new JTextField("lecturer id",20);
         name = new JTextField("name",20);
         lastName = new JTextField("last name",20);
@@ -48,10 +49,10 @@ public class Lecturer  extends JFrame{
         lastName.setBounds(30,70,100,20);
         dob.setBounds(30,100,100,20);
         address.setBounds(30,130,100,20);
-        addb.setBounds(30,100,100,20);
+        addb.setBounds(160,130,100,20);
         search.setBounds(160,100,100,20);
         delte.setBounds(280,100,100,20);
-        updateb.setBounds(30,130,100,20);
+        updateb.setBounds(280,130,100,20);
 
 
         add(id);add(name);add(lastName);add(dob);add(address);add(addb);add(search);add(delte);add(updateb);
@@ -65,7 +66,7 @@ public class Lecturer  extends JFrame{
     public  void clear(){
         id.setText("");name.setText("");lastName.setText("");dob.setText("");address.setText("");
     }
-    public static void updateLect(String id, String name , String lastName, String dob, String address) throws Exception{
+    public static void addLect(String id, String name , String lastName, String dob, String address) throws Exception{
         try {
             PreparedStatement posted = conn.prepareStatement("INSERT INTO LECTURERS_TABLE (ID, NAME, LAST_NAME, DOB, ADDRESS) VALUES ('"+ id +"', '"+ name +"', '"+ lastName +"', '"+ dob +"', '"+ address +"')");
             posted.executeLargeUpdate();
@@ -73,7 +74,7 @@ public class Lecturer  extends JFrame{
             e.printStackTrace();
         }
     }
-    public static ArrayList<String>searchClass(String id) throws Exception {
+    public static ArrayList<String>searchLect(String id) throws Exception {
         try {
             PreparedStatement searched = conn.prepareStatement("SELECT * FROM LECTURERS_TABLE WHERE ID="+id);
             ResultSet result = searched.executeQuery();
@@ -98,13 +99,13 @@ public class Lecturer  extends JFrame{
         }
         return null;
     }
-    public static void deleteClass(String id) throws Exception {
-        PreparedStatement deleted = conn.prepareStatement("DELETE  FROM LECTURER_TABLE WHERE ID="+id);
+    public static void deleteLect(String id) throws Exception {
+        PreparedStatement deleted = conn.prepareStatement("DELETE  FROM LECTURERS_TABLE WHERE ID="+id);
         deleted.executeLargeUpdate();
     }
 
-    public static void updateClass(String id, String name , String lastName, String dob, String address) throws Exception {
-        PreparedStatement updated = conn.prepareStatement("UPDATE LECTURER_TABLE SET ID="+id+",NAME="+name+",LAST_NAME="+lastName+",DOB="+dob+",ADDRESS="+address+" WHERE ID="+id);
+    public static void updateLect(String id, String name , String lastName, String dob, String address) throws Exception {
+        PreparedStatement updated = conn.prepareStatement("UPDATE LECTURERS_TABLE SET ID="+id+",NAME="+name+",LAST_NAME="+lastName+",DOB="+dob+",ADDRESS="+address+" WHERE ID="+id);
         updated.executeLargeUpdate();
     }
     private class ButtonClickListener implements ActionListener {
@@ -112,7 +113,7 @@ public class Lecturer  extends JFrame{
             String command = e.getActionCommand();
             if( command.equals( "add"))  {
                 try {
-                    updateLect(id.getText(),name.getText(),lastName.getText(),dob.getText(),address.getText());
+                    addLect(id.getText(),name.getText(),lastName.getText(),dob.getText(),address.getText());
                     clear();
                 } catch (Exception e1) {
                     e1.printStackTrace();
@@ -120,7 +121,7 @@ public class Lecturer  extends JFrame{
             }
             else if( command.equals( "search" ) )  {
                 try {
-                    vals = searchClass(id.getText());
+                    vals = searchLect(id.getText());
 
                 } catch (Exception e1) {
                     e1.printStackTrace();
@@ -129,7 +130,7 @@ public class Lecturer  extends JFrame{
             }
             else  if (command.equals("delete")){
                 try {
-                    deleteClass(id.getText());
+                    deleteLect(id.getText());
                     clear();
                 } catch (Exception e1) {
                     e1.printStackTrace();
@@ -138,7 +139,7 @@ public class Lecturer  extends JFrame{
             }
             else if (command.equals("update")){
                 try {
-                    updateClass(id.getText(),name.getText(),lastName.getText(),dob.getText(),address.getText());
+                    updateLect(id.getText(),name.getText(),lastName.getText(),dob.getText(),address.getText());
                     clear();
                 } catch (Exception e1) {
                     e1.printStackTrace();
