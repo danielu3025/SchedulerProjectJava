@@ -105,7 +105,7 @@ public class Lecturer  extends JFrame{
     }
 
     public static void updateLect(String id, String name , String lastName, String dob, String address) throws Exception {
-        PreparedStatement updated = conn.prepareStatement("UPDATE LECTURERS_TABLE SET ID="+id+",NAME="+name+",LAST_NAME="+lastName+",DOB="+dob+",ADDRESS="+address+" WHERE ID="+id);
+        PreparedStatement updated = conn.prepareStatement("UPDATE LECTURERS_TABLE SET NAME="+name+",LAST_NAME="+lastName+",DOB="+dob+",ADDRESS="+address+" WHERE ID="+id);
         updated.executeLargeUpdate();
     }
     private class ButtonClickListener implements ActionListener {
