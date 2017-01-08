@@ -1,8 +1,27 @@
 import java.sql.Connection;
+import java.sql.DriverManager;
 
 public class Main{
-     public static Connection conn ;
+     private static Connection con ;
     public static void main(String[] args) throws Exception {
-        ClassRoom g = new ClassRoom();
+        connect();
+        if(con != null) {
+            ClassRoom g = new ClassRoom(con);
+        }
+    }
+    private static void connect() throws Exception {
+        try {
+            String driver = "com.mysql.jdbc.Driver";
+            //String url = "jdbc:mysql://localhost:8080/schedulerDB";
+            String url = "jdbc:mysql://localhost:3306/schedulerDB";
+            String userName = "root";
+            String password = "root";
+            Class.forName(driver);
+
+            con = DriverManager.getConnection(url, userName, password);
+            System.out.println("connected secseed");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
 }
