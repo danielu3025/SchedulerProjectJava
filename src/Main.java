@@ -7,8 +7,8 @@ public class Main{
         connect();
         if(con != null) {
             //ClassRoom g = new ClassRoom(con);
-            Lecturer l = new Lecturer(con);
-            //Courses c = new Courses(con);
+            //Lecturer l = new Lecturer(con);
+            Courses c = new Courses(con);
         }
     }
     private static void connect() throws Exception {

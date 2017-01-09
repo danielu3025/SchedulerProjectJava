@@ -22,7 +22,7 @@ public class Lecturer  extends JFrame{
         id = new JTextField("lecturer id",20);
         name = new JTextField("name",20);
         lastName = new JTextField("last name",20);
-        dob = new JTextField("date of birth",20);
+        dob = new JTextField("dd/mm/yyyy",20);
         address = new JTextField("address",20);
         JButton addB = new JButton("add");
         JButton search = new JButton("search");
@@ -79,6 +79,7 @@ public class Lecturer  extends JFrame{
                 posted.setString(4,dob);
                 posted.setString(5,address);
                 posted.executeLargeUpdate();
+                System.out.println("lecturer added");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -90,7 +91,6 @@ public class Lecturer  extends JFrame{
             searched.setString(1,id);
             ResultSet result = searched.executeQuery();
             makeLectArr(result);
-
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -110,18 +110,12 @@ public class Lecturer  extends JFrame{
                 System.out.println("row didn't found");
         }else
             System.out.println("can't delete lecturer which has course attached");
-            //need to delete first from Collage table*/
+            //need to delete first from Collage table
     }
     private static void makeLectArr(ResultSet r){
         try {
             lValArr = new ArrayList<>();
             while (r.next()){
-                System.out.println(r.getString("ID"));
-                System.out.println(r.getString("NAME"));
-                System.out.println(r.getString("LAST_NAME"));
-                System.out.println(r.getString("DOB"));
-                System.out.println(r.getString("ADDRESS"));
-
                 lValArr.add(r.getString("ID"));
                 lValArr.add(r.getString("NAME"));
                 lValArr.add(r.getString("LAST_NAME"));
@@ -173,7 +167,7 @@ public class Lecturer  extends JFrame{
                     try {
                         if(validation(i)) {
                             searchLect(i);
-                            if (lValArr.size() != 0) {
+                            if (lValArr.size() > 0) {
                                 id.setText(lValArr.get(0));
                                 name.setText(lValArr.get(1));
                                 lastName.setText(lValArr.get(2));
@@ -198,7 +192,6 @@ public class Lecturer  extends JFrame{
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
-
                     break;
                 case "update":
                     try {

@@ -16,8 +16,8 @@ class ClassRoom extends JFrame {
     public ClassRoom(Connection conn) throws HeadlessException {
         classCon = conn;
         number = new JTextField("class number",20);
-        building = new JTextField("class building",20);
-        floor = new JTextField("class floor",20);
+        building = new JTextField("building",20);
+        floor = new JTextField("floor",20);
 
 
         JButton addB = new JButton("add");
@@ -73,6 +73,7 @@ class ClassRoom extends JFrame {
                 posted.setString(2,n);
                 posted.setString(3,f);
                 posted.executeLargeUpdate();
+                System.out.println("class added");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -92,11 +93,6 @@ class ClassRoom extends JFrame {
         try {
             cValArr = new ArrayList<>();
             while (r.next()){
-                System.out.println(r.getString("CLASS"));
-                System.out.println(r.getString("BUILDING"));
-                System.out.println(r.getString("FLOOR"));
-
-
                 cValArr.add(r.getString("ClASS"));
                 cValArr.add(r.getString("BUILDING"));
                 cValArr.add(r.getString("FLOOR"));
@@ -162,7 +158,7 @@ class ClassRoom extends JFrame {
                     try {
                         if (validation(n)) {
                             searchClass(n);
-                            if (cValArr.size() != 0) {
+                            if (cValArr.size() > 0) {
                                 number.setText(cValArr.get(0));
                                 building.setText(cValArr.get(1));
                                 floor.setText(cValArr.get(2));
