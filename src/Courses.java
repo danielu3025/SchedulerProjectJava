@@ -7,7 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 
-public class Cours  extends JFrame{
+public class Courses extends JFrame{
     JTextField id;
     JTextField name;
     JTextField length;
@@ -17,7 +17,7 @@ public class Cours  extends JFrame{
     ArrayList<String> vals = new ArrayList<>();
     public  static Connection conn;
 
-    public Cours(Connection con) {
+    public Courses(Connection con) {
         conn = con;
         id = new JTextField(" cours id",20);
         name = new JTextField("name",20);
@@ -40,7 +40,7 @@ public class Cours  extends JFrame{
         updateb.addActionListener(new ButtonClickListenerr());
 
         setSize(500,500);
-        setTitle("Cours");
+        setTitle("Courses");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         id.setBounds(30,10,100,20);
         name.setBounds(30,40,100,20);
@@ -95,7 +95,7 @@ public class Cours  extends JFrame{
 
 
     public static void updateCours(String id, String name , String length, String semester) throws Exception {
-        PreparedStatement updated = conn.prepareStatement("UPDATE COURSES_TABLE SET NAME="+name+",LENGTH="+length+",SEMSTER="+semester+" WHERE ID="+id);
+        PreparedStatement updated = conn.prepareStatement("UPDATE COURSES_TABLE SET NAME="+name+", LENGTH="+length+", SEMSTER="+semester+" WHERE ID="+id);
         updated.executeLargeUpdate();
     }
 
@@ -133,7 +133,7 @@ public class Cours  extends JFrame{
             }
             else if (command.equals("update")) {
                 try {
-                    updateCours(id.getText(),name.getName(),length.getText(),semester.getText());
+                    updateCours(id.getText(),name.getText(),length.getText(),semester.getText());
                 } catch (Exception e1) {
                     e1.printStackTrace();
                 }
