@@ -9,12 +9,12 @@ class ClassRoom extends JFrame {
     private JTextField number;
     private JTextField building;
     private JTextField floor;
-    private static Connection con;
-    private static ArrayList<String> array = new ArrayList<>();
+    private static Connection classCon;
+    private static ArrayList<String> cValArr = new ArrayList<>();
 
 
     public ClassRoom(Connection conn) throws HeadlessException {
-        con = conn;
+        classCon = conn;
         number = new JTextField("class number",20);
         building = new JTextField("class building",20);
         floor = new JTextField("class floor",20);
@@ -64,15 +64,20 @@ class ClassRoom extends JFrame {
 
     private static void addClass(String b, String n, String f) throws Exception{
         try {
-            PreparedStatement posted = con.prepareStatement("INSERT INTO CLASS_TABLE (BUILDING, CLASS, FLOOR) VALUES ('"+ b +"', '"+ n +"', '"+ f +"')");
-            posted.executeLargeUpdate();
+            searchClass(n);
+            if (cValArr.size()>0){
+                System.out.println("class already exist");
+            }else {
+                PreparedStatement posted = classCon.prepareStatement("INSERT INTO CLASS_TABLE (BUILDING, CLASS, FLOOR) VALUES ('" + b + "', '" + n + "', '" + f + "')");
+                posted.executeLargeUpdate();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
     private static void searchClass(String n) throws Exception {
         try {
-            PreparedStatement searched = con.prepareStatement("SELECT * FROM CLASS_TABLE WHERE CLASS="+ n);
+            PreparedStatement searched = classCon.prepareStatement("SELECT * FROM CLASS_TABLE WHERE CLASS="+ n);
             ResultSet result = searched.executeQuery();
             makeClassArr(result);
         }catch (Exception e){
@@ -81,26 +86,27 @@ class ClassRoom extends JFrame {
     }
     private static void makeClassArr(ResultSet r){
         try {
-            array = new ArrayList<>();
+            cValArr = new ArrayList<>();
             while (r.next()){
                 System.out.println(r.getString("CLASS"));
-                System.out.println(r.getString("FLOOR"));
                 System.out.println(r.getString("BUILDING"));
+                System.out.println(r.getString("FLOOR"));
 
-                array.add(r.getString("ClASS"));
-                array.add(r.getString("FLOOR"));
-                array.add(r.getString("BUILDING"));
+
+                cValArr.add(r.getString("ClASS"));
+                cValArr.add(r.getString("BUILDING"));
+                cValArr.add(r.getString("FLOOR"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
     private static void deleteClass(String n) throws Exception {
-        PreparedStatement searched = con.prepareStatement("SELECT * FROM COLLAGE_TABLE WHERE CLASS="+ n);
+        PreparedStatement searched = classCon.prepareStatement("SELECT * FROM COLLAGE_TABLE WHERE CLASS="+ n);
         ResultSet result = searched.executeQuery();
         makeClassArr(result);
-        if(array.size() == 0) {
-            PreparedStatement deleted = con.prepareStatement("DELETE  FROM CLASS_TABLE WHERE CLASS=" + n);
+        if(cValArr.size() == 0) {
+            PreparedStatement deleted = classCon.prepareStatement("DELETE  FROM CLASS_TABLE WHERE CLASS=" + n);
             long t = deleted.executeLargeUpdate();
             if (t>0)
                 System.out.println("row deleted");
@@ -112,11 +118,11 @@ class ClassRoom extends JFrame {
     }
 
     private static void updateClass(String b, String n, String f) throws Exception {
-        PreparedStatement searched = con.prepareStatement("SELECT * FROM COLLAGE_TABLE WHERE CLASS="+ n);
+        PreparedStatement searched = classCon.prepareStatement("SELECT * FROM COLLAGE_TABLE WHERE CLASS="+ n);
         ResultSet result = searched.executeQuery();
         makeClassArr(result);
-        if(array.size() == 0) {
-            PreparedStatement updated = con.prepareStatement("UPDATE CLASS_TABLE SET FLOOR="+ f +",BUILDING="+ b +" WHERE CLASS="+ n);
+        if(cValArr.size() == 0) {
+            PreparedStatement updated = classCon.prepareStatement("UPDATE CLASS_TABLE SET FLOOR="+ f +",BUILDING="+ b +" WHERE CLASS="+ n);
             long t = updated.executeLargeUpdate();
             if (t>0)
                 System.out.println("row updated");
@@ -141,10 +147,10 @@ class ClassRoom extends JFrame {
                 case "search":
                     try {
                         searchClass(number.getText());
-                        if (array.size() != 0) {
-                            number.setText(array.get(0));
-                            building.setText(array.get(1));
-                            floor.setText(array.get(2));
+                        if (cValArr.size() != 0) {
+                            number.setText(cValArr.get(0));
+                            building.setText(cValArr.get(1));
+                            floor.setText(cValArr.get(2));
                             System.out.println("filled all records");
                         } else
                             System.out.println("no record");
