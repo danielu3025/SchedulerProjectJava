@@ -72,7 +72,12 @@ public class Lecturer  extends JFrame{
             if (lValArr.size()>0){
                 System.out.println("can't add existing lecturer");
             } else {
-                PreparedStatement posted = lectConn.prepareStatement("INSERT INTO LECTURERS_TABLE (ID, NAME, LAST_NAME, DOB, ADDRESS) VALUES ('" + id + "', '" + name + "', '" + lastName + "', '" + dob + "', '" + address + "')");
+                PreparedStatement posted = lectConn.prepareStatement("INSERT INTO LECTURERS_TABLE (ID, NAME, LAST_NAME, DOB, ADDRESS) VALUES (?,?,?,?,?)");
+                posted.setString(1,id);
+                posted.setString(2,name);
+                posted.setString(3,lastName);
+                posted.setString(4,dob);
+                posted.setString(5,address);
                 posted.executeLargeUpdate();
             }
         } catch (Exception e) {
@@ -81,7 +86,8 @@ public class Lecturer  extends JFrame{
     }
     public static void searchLect(String id) throws Exception {
         try {
-            PreparedStatement searched = lectConn.prepareStatement("SELECT * FROM LECTURERS_TABLE WHERE ID="+id);
+            PreparedStatement searched = lectConn.prepareStatement("SELECT * FROM LECTURERS_TABLE WHERE ID=?");
+            searched.setString(1,id);
             ResultSet result = searched.executeQuery();
             makeLectArr(result);
 
@@ -90,11 +96,13 @@ public class Lecturer  extends JFrame{
         }
     }
     public static void deleteLect(String id) throws Exception {
-        PreparedStatement searched = lectConn.prepareStatement("SELECT * FROM COLLAGE_TABLE WHERE LECTURER_ID="+ id);
+        PreparedStatement searched = lectConn.prepareStatement("SELECT * FROM COLLAGE_TABLE WHERE LECTURER_ID=?");
+        searched.setString(1,id);
         ResultSet result = searched.executeQuery();
         makeLectArr(result);
         if (lValArr.size() == 0){
-            PreparedStatement deleted = lectConn.prepareStatement("DELETE  FROM LECTURERS_TABLE WHERE ID="+id);
+            PreparedStatement deleted = lectConn.prepareStatement("DELETE  FROM LECTURERS_TABLE WHERE ID=?");
+            deleted.setString(1,id);
             long t = deleted.executeLargeUpdate();
             if (t>0)
                 System.out.println("row deleted");
@@ -125,7 +133,8 @@ public class Lecturer  extends JFrame{
         }
     }
     public static void updateLect(String id, String name , String lastName, String dob, String address) throws Exception {
-        PreparedStatement searched = lectConn.prepareStatement("SELECT * FROM COLLAGE_TABLE WHERE LECTURER_ID="+ id);
+        PreparedStatement searched = lectConn.prepareStatement("SELECT * FROM COLLAGE_TABLE WHERE LECTURER_ID=?");
+        searched.setString(1,id);
         ResultSet result = searched.executeQuery();
         makeLectArr(result);
         if(lValArr.size() == 0) {
@@ -147,35 +156,45 @@ public class Lecturer  extends JFrame{
     private class ButtonClickListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             String command = e.getActionCommand();
+            String i = id.getText(), n = name.getText(), lN = lastName.getText(), bd = dob.getText(), add = address.getText();
             switch (command) {
                 case "add":
                     try {
-                        addLect(id.getText(), name.getText(), lastName.getText(), dob.getText(), address.getText());
-                        clear();
+                        if (validation(i) && validation(n) && validation(lN) && dobValidation(bd) && validation(add)) {
+                            addLect(i, n, lN, bd, add);
+                            clear();
+                        }else
+                            System.out.println("please fix inputs");
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
                     break;
                 case "search":
                     try {
-                        searchLect(id.getText());
-                        if(lValArr.size() != 0) {
-                            id.setText(lValArr.get(0));
-                            name.setText(lValArr.get(1));
-                            lastName.setText(lValArr.get(2));
-                            dob.setText(lValArr.get(3));
-                            address.setText(lValArr.get(4));
-                            System.out.println("filled all records");
+                        if(validation(i)) {
+                            searchLect(i);
+                            if (lValArr.size() != 0) {
+                                id.setText(lValArr.get(0));
+                                name.setText(lValArr.get(1));
+                                lastName.setText(lValArr.get(2));
+                                dob.setText(lValArr.get(3));
+                                address.setText(lValArr.get(4));
+                                System.out.println("filled all records");
+                            } else
+                                System.out.println("no record");
                         } else
-                            System.out.println("no record");
+                            System.out.println("please fix inputs");
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
                     break;
                 case "delete":
                     try {
-                        deleteLect(id.getText());
-                        clear();
+                        if (validation(i)){
+                            deleteLect(i);
+                            clear();
+                        }else
+                            System.out.println("please fix inputs");
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
@@ -183,13 +202,33 @@ public class Lecturer  extends JFrame{
                     break;
                 case "update":
                     try {
-                        updateLect(id.getText(), name.getText(), lastName.getText(), dob.getText(), address.getText());
-                        clear();
+                        if(validation(i) && validation(n) && validation(lN) && dobValidation(bd) && validation(add)) {
+                            updateLect(i, n, lN, bd, add);
+                            clear();
+                        } else
+                            System.out.println("please fix inputs");
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
                     break;
             }
         }
+    }
+    private boolean validation(String n){
+        return n.length() > 0 && n.length() < 15;
+    }
+    private boolean dobValidation(String dob){
+        String days,months,years;
+        int d, m, y;
+        if (dob.length() == 10 && dob.charAt(2) == '/' && dob.charAt(5) == '/'){
+            days = dob.substring(0,2);
+            d = Integer.parseInt(days);
+            months = dob.substring(3,5);
+            m = Integer.parseInt(months);
+            years = dob.substring(6,10);
+            y = Integer.parseInt(years);
+            return d>0 && d<32 && m>0 && m<13 && y > 1900 && y < 2000;
+        } else
+            return false;
     }
 }

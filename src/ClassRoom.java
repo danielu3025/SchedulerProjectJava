@@ -68,7 +68,10 @@ class ClassRoom extends JFrame {
             if (cValArr.size()>0){
                 System.out.println("class already exist");
             }else {
-                PreparedStatement posted = classCon.prepareStatement("INSERT INTO CLASS_TABLE (BUILDING, CLASS, FLOOR) VALUES ('" + b + "', '" + n + "', '" + f + "')");
+                PreparedStatement posted = classCon.prepareStatement("INSERT INTO CLASS_TABLE (BUILDING, CLASS, FLOOR) VALUES (?,?,?)");
+                posted.setString(1,b);
+                posted.setString(2,n);
+                posted.setString(3,f);
                 posted.executeLargeUpdate();
             }
         } catch (Exception e) {
@@ -77,7 +80,8 @@ class ClassRoom extends JFrame {
     }
     private static void searchClass(String n) throws Exception {
         try {
-            PreparedStatement searched = classCon.prepareStatement("SELECT * FROM CLASS_TABLE WHERE CLASS="+ n);
+            PreparedStatement searched = classCon.prepareStatement("SELECT * FROM CLASS_TABLE WHERE CLASS=?");
+            searched.setString(1,n);
             ResultSet result = searched.executeQuery();
             makeClassArr(result);
         }catch (Exception e){
@@ -102,11 +106,13 @@ class ClassRoom extends JFrame {
         }
     }
     private static void deleteClass(String n) throws Exception {
-        PreparedStatement searched = classCon.prepareStatement("SELECT * FROM COLLAGE_TABLE WHERE CLASS="+ n);
+        PreparedStatement searched = classCon.prepareStatement("SELECT * FROM COLLAGE_TABLE WHERE CLASS=?");
+        searched.setString(1,n);
         ResultSet result = searched.executeQuery();
         makeClassArr(result);
         if(cValArr.size() == 0) {
-            PreparedStatement deleted = classCon.prepareStatement("DELETE  FROM CLASS_TABLE WHERE CLASS=" + n);
+            PreparedStatement deleted = classCon.prepareStatement("DELETE  FROM CLASS_TABLE WHERE CLASS=?");
+            deleted.setString(1,n);
             long t = deleted.executeLargeUpdate();
             if (t>0)
                 System.out.println("row deleted");
@@ -118,11 +124,15 @@ class ClassRoom extends JFrame {
     }
 
     private static void updateClass(String b, String n, String f) throws Exception {
-        PreparedStatement searched = classCon.prepareStatement("SELECT * FROM COLLAGE_TABLE WHERE CLASS="+ n);
+        PreparedStatement searched = classCon.prepareStatement("SELECT * FROM COLLAGE_TABLE WHERE CLASS=?");
+        searched.setString(1,n);
         ResultSet result = searched.executeQuery();
         makeClassArr(result);
         if(cValArr.size() == 0) {
-            PreparedStatement updated = classCon.prepareStatement("UPDATE CLASS_TABLE SET FLOOR="+ f +",BUILDING="+ b +" WHERE CLASS="+ n);
+            PreparedStatement updated = classCon.prepareStatement("UPDATE CLASS_TABLE SET FLOOR=?,BUILDING=? WHERE CLASS=?");
+            updated.setString(1,f);
+            updated.setString(2,b);
+            updated.setString(3,n);
             long t = updated.executeLargeUpdate();
             if (t>0)
                 System.out.println("row updated");
@@ -135,41 +145,54 @@ class ClassRoom extends JFrame {
     public class ButtonClickListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             String command = e.getActionCommand();
+            String b = building.getText(), n = number.getText(), f = floor.getText();
             switch (command) {
                 case "add":
                     try {
-                        addClass(building.getText(), number.getText(), floor.getText());
-                        clear();
+                        if(validation(b)&&validation(n)&&validation(f)) {
+                            addClass(b,n,f);
+                            clear();
+                        } else
+                            System.out.println("please fix the inputs");
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
                     break;
                 case "search":
                     try {
-                        searchClass(number.getText());
-                        if (cValArr.size() != 0) {
-                            number.setText(cValArr.get(0));
-                            building.setText(cValArr.get(1));
-                            floor.setText(cValArr.get(2));
-                            System.out.println("filled all records");
-                        } else
-                            System.out.println("no record");
+                        if (validation(n)) {
+                            searchClass(n);
+                            if (cValArr.size() != 0) {
+                                number.setText(cValArr.get(0));
+                                building.setText(cValArr.get(1));
+                                floor.setText(cValArr.get(2));
+                                System.out.println("filled all records");
+                            } else
+                                System.out.println("no record");
+                        }else
+                            System.out.println("please fix class number");
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
                     break;
                 case "delete":
                     try {
-                        deleteClass(number.getText());
-                        clear();
+                        if (validation(n)) {
+                            deleteClass(n);
+                            clear();
+                        } else
+                            System.out.println("please fix class number");
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
                     break;
                 case "update":
                     try {
-                        updateClass(building.getText(), number.getText(), floor.getText());
-                        clear();
+                        if (validation(b)&&validation(n)&&validation(f)) {
+                            updateClass(b, n, f);
+                            clear();
+                        } else
+                            System.out.println("please fix the inputs");
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
@@ -177,5 +200,7 @@ class ClassRoom extends JFrame {
             }
         }
     }
-
+    private boolean validation(String n){
+        return n.length() > 0 && n.length() < 15;
+    }
 }
