@@ -8,7 +8,8 @@ public class Main{
         if(con != null) {
             //ClassRoom g = new ClassRoom(con);
             //Lecturer l = new Lecturer(con);
-            Courses c = new Courses(con);
+            //Courses c = new Courses(con);
+            Menu m = new Menu();
         }
     }
     private static void connect() throws Exception {
@@ -23,7 +24,7 @@ public class Main{
             con = DriverManager.getConnection(url, userName, password);
             System.out.println("connected succeed");
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 }
