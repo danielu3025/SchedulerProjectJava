@@ -46,7 +46,8 @@ public class Menu  extends JFrame{
             data[0][3] = "test";
             data[0][4] = "test";
             data[0][5] = "test";
-// enter data from here
+// enter data from her
+// you can run this in for loop
 
         model = new DefaultTableModel(data,columns) {
             @Override
