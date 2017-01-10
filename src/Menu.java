@@ -10,7 +10,7 @@ public class Menu  extends JFrame{
 
     private DefaultTableModel model = new DefaultTableModel();
 
-    private Object[] columns = {"Name", "Unit", "Code", "Country", "Rate", "Change"};
+    private Object[] columns = {"Index", "Lecturer id", "Class num", "Course id", "Day", "Beginning"};
 
 
     private TableRowSorter<TableModel> rowSorter;
@@ -46,7 +46,7 @@ public class Menu  extends JFrame{
             data[0][3] = "test";
             data[0][4] = "test";
             data[0][5] = "test";
-
+// enter data from here
 
         model = new DefaultTableModel(data,columns) {
             @Override
