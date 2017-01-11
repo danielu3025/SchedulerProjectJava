@@ -2,31 +2,26 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 
-/**
- * Created by danielluzgarten on 09/01/2017.
- */
 public class Collage extends JFrame {
     private JTextField lID;
     private JTextField cID;
     private JTextField clNum;
     private JTextField day;
-    private JTextField begine;
+    private JTextField begin;
     private static ArrayList<String> valArr = new ArrayList<>();
+    private static ArrayList<ArrayList<String>> qarr = new ArrayList<ArrayList<String>>();
     private static Connection conn;
 
     public Collage(Connection con) throws HeadlessException {
         conn = con;
-        lID = new JTextField("lecturerc ID",20);
-        cID = new JTextField("courseID",20);
-        clNum = new JTextField("calss num",20);
-        day = new JTextField("dat",3);
-        begine = new JTextField("begine",3);
+        lID = new JTextField("Lecturer ID",20);
+        cID = new JTextField("course ID",20);
+        clNum = new JTextField("Class num",20);
+        day = new JTextField("Day - sun",3);
+        begin = new JTextField("Begin",3);
         JButton addB = new JButton("add");
         JButton search = new JButton("search");
         JButton delete = new JButton("delete");
@@ -45,20 +40,20 @@ public class Collage extends JFrame {
 
 
         setSize(500,500);
-        setTitle("Class");
+        setTitle("scheduler Table");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         lID.setBounds(30,10,100,20);
         cID.setBounds(30,40,100,20);
         clNum.setBounds(30,70,100,20);
         day.setBounds(30,100,100,20);
-        begine.setBounds(30,130,100,20);
+        begin.setBounds(30,130,100,20);
         addB.setBounds(160,130,100,20);
         search.setBounds(160,100,100,20);
         delete.setBounds(280,100,100,20);
         updateB.setBounds(280,130,100,20);
 
 
-        add(lID);add(cID);add(clNum);add(day);add(begine);add(addB);add(search);add(delete);add(updateB);
+        add(lID);add(cID);add(clNum);add(day);add(begin);add(addB);add(search);add(delete);add(updateB);
         setLayout(new BorderLayout());
         setResizable(false);
         setLayout(new FlowLayout());
@@ -71,9 +66,9 @@ public class Collage extends JFrame {
         cID.setText("");
         clNum.setText("");
         day.setText("");
-        begine.setText("");
+        begin.setText("");
     }
-    public static void addLect(String lid, String cid, String classnum, String day,String beginning) throws Exception{
+    public static void addToCollage(String lid, String cid, String classnum, String day, String beginning) throws Exception{
         try {
             PreparedStatement posted = conn.prepareStatement("INSERT INTO COLLAGE_TABLE (LECTURER_ID, COURSE_ID, CLASS, DAY, BEGINNING) VALUES (?,?,?,?,?)");
             posted.setString(1,lid);posted.setString(2,cid);posted.setString(3,classnum);posted.setString(4,day);posted.setString(5,beginning);
@@ -83,24 +78,28 @@ public class Collage extends JFrame {
             e.printStackTrace();
         }
     }
-    public static void searchLect(String lid, String cid, String classnum, String day,String beginning) throws Exception {
+    public static void searchCollage(String lid, String cid, String classnum, String day, String beginning) throws Exception {
         try {
             PreparedStatement searched = conn.prepareStatement("SELECT * FROM COLLAGE_TABLE WHERE (LECTURER_ID = ? AND COURSE_ID= ? AND CLASS=? AND DAY= ?  AND BEGINNING= ?)");
             searched.setString(1,lid);searched.setString(2,cid);searched.setString(3,classnum);searched.setString(4,day);searched.setString(5,beginning);
             ResultSet result = searched.executeQuery();
-            makeLectArr(result);
+            makeCollageArr(result);
 
         }catch (Exception e){
             e.printStackTrace();
         }
     }
-    public static void deleteLect(String lid, String cid, String classnum, String day,String beginning) throws Exception {
-        PreparedStatement delelted = conn.prepareStatement("DELETE FROM COLLAGE_TABLE WHERE LECTURER_ID = ? AND COURSE_ID= ? AND CLASS=? AND DAY= ?  AND BEGINNING= ?");
+    public static void deleteFromCollage(String lid, String cid, String classnum, String day, String beginning) throws Exception {
+        PreparedStatement deleted = conn.prepareStatement("DELETE FROM COLLAGE_TABLE WHERE LECTURER_ID = ? AND COURSE_ID= ? AND CLASS=? AND DAY= ?  AND BEGINNING= ?");
         //delete from  all tables before;
-        delelted.setString(1,lid);delelted.setString(2,cid);delelted.setString(3,classnum);delelted.setString(4,day);delelted.setString(5,beginning);
-        delelted.executeLargeUpdate();
+        deleted.setString(1,lid);
+        deleted.setString(2,cid);
+        deleted.setString(3,classnum);
+        deleted.setString(4,day);
+        deleted.setString(5,beginning);
+        deleted.executeLargeUpdate();
     }
-    private static void makeLectArr(ResultSet r){
+    private static void makeCollageArr(ResultSet r){
         try {
             valArr = new ArrayList<>();
             while (r.next()){
@@ -111,16 +110,17 @@ public class Collage extends JFrame {
                 valArr.add(r.getString("BEGINNING"));
                 System.out.println(valArr.get(1));
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-    public static void updateLect(String lid, String cid, String classnum, String day,String beginning) throws Exception {
+    public static void updateCollage(String lid, String cid, String classnum, String day, String beginning) throws Exception {
         PreparedStatement searched = conn.prepareStatement("SELECT * FROM COLLAGE_TABLE WHERE LECTURER_ID = ? AND COURSE_ID= ? AND CLASS=? AND DAY= ? AND BEGINNING=?");
         searched.setString(1,lid);searched.setString(2,cid);searched.setString(3,classnum);searched.setString(4,day);searched.setString(5,beginning);
         ResultSet result = searched.executeQuery();
-        makeLectArr(result);
-        makeLectArr(result);
+        makeCollageArr(result);
+        makeCollageArr(result);
         if(valArr.size() == 0) {
             PreparedStatement updated = conn.prepareStatement("UPDATE COLLAGE_TABLE SET LECTURER_ID = ? AND COURSE_ID= ? AND CLASS=? AND DAY= ? AND BEGINNING=? WHERE LECTURER_ID = ? AND COURSE_ID= ? AND CLASS=? AND DAY= ? AND BEGINNING=? ");
             updated.setString(1,lid);updated.setString(2,cid);
@@ -145,7 +145,7 @@ public class Collage extends JFrame {
             switch (command) {
                 case "add":
                     try {
-                        addLect(lID.getText(), cID.getText(), clNum.getText(), day.getText(), begine.getText());
+                        addToCollage(lID.getText(), cID.getText(), clNum.getText(), day.getText(), begin.getText());
                         clear();
                     } catch (Exception e1) {
                         e1.printStackTrace();
@@ -153,13 +153,13 @@ public class Collage extends JFrame {
                     break;
                 case "search":
                     try {
-                        searchLect(lID.getText(),cID.getText(), clNum.getText(), day.getText(), begine.getText());
+                        searchCollage(lID.getText(),cID.getText(), clNum.getText(), day.getText(), begin.getText());
                         if(valArr.size() != 0) {
                             lID.setText(valArr.get(0));
                             cID.setText(valArr.get(1));
                             clNum.setText(valArr.get(2));
                             day.setText(valArr.get(3));
-                            begine.setText(valArr.get(4));
+                            begin.setText(valArr.get(4));
                             System.out.println("filled all records");
                         } else
                             System.out.println("no record");
@@ -169,7 +169,7 @@ public class Collage extends JFrame {
                     break;
                 case "delete":
                     try {
-                        deleteLect(lID.getText(), cID.getText(), clNum.getText(), day.getText(), begine.getText());
+                        deleteFromCollage(lID.getText(), cID.getText(), clNum.getText(), day.getText(), begin.getText());
                         clear();
                     } catch (Exception e1) {
                         e1.printStackTrace();
@@ -178,7 +178,7 @@ public class Collage extends JFrame {
                     break;
                 case "update":
                     try {
-                        updateLect(lID.getText(), cID.getText(), clNum.getText(), day.getText(), begine.getText());
+                        updateCollage(lID.getText(), cID.getText(), clNum.getText(), day.getText(), begin.getText());
                         clear();
                     } catch (Exception e1) {
                         e1.printStackTrace();
@@ -186,5 +186,11 @@ public class Collage extends JFrame {
                     break;
             }
         }
+    }
+
+    public static ResultSet queryAll() throws SQLException {
+        PreparedStatement searched = conn.prepareStatement("SELECT * FROM COLLAGE_TABLE");
+        ResultSet resultSet = searched.executeQuery();
+        return resultSet;
     }
 }

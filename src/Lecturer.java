@@ -42,7 +42,7 @@ public class Lecturer  extends JFrame{
 
 
         setSize(500,500);
-        setTitle("Class");
+        setTitle("Lecturer");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         id.setBounds(30,10,100,20);
         name.setBounds(30,40,100,20);
