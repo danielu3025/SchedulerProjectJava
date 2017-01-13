@@ -1,3 +1,5 @@
+package com.sql;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -12,16 +14,18 @@ public class Courses extends JFrame{
     private JTextField id;
     private JTextField name;
     private JTextField length;
+    private JTextField year;
     private JTextField semester;
-    private static ArrayList<String> coursesValArr = new ArrayList<>();
+    static ArrayList<String> coursesValArr = new ArrayList<>();
     private static Connection coursesConn;
 
     public Courses(Connection con) {
         coursesConn = con;
-        id = new JTextField("course id",20);
-        name = new JTextField("name",20);
-        length = new JTextField("length: hh:mm",20);
-        semester = new JTextField("semester",20);
+        id = new JTextField("course id",15);
+        name = new JTextField("name",15);
+        length = new JTextField("length: 2.5",4);
+        semester = new JTextField("semester",1);
+        year = new JTextField("year - yyyy",4);
 
         JButton addB = new JButton("add");
         JButton search = new JButton("search");
@@ -39,18 +43,19 @@ public class Courses extends JFrame{
         updateB.addActionListener(new ButtonClickListener());
 
         setSize(500,500);
-        setTitle("Courses");
+        setTitle("com.sql.Courses");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         id.setBounds(30,10,100,20);
         name.setBounds(30,40,100,20);
         length.setBounds(30,70,100,20);
         semester.setBounds(30,100,100,20);
+        year.setBounds(30,130,100,20);
         addB.setBounds(160,130,100,20);
         search.setBounds(160,100,100,20);
         deleteB.setBounds(280,100,100,20);
         updateB.setBounds(280,130,100,20);
 
-        add(id);add(name);add(length);add(semester);add(addB);add(search);add(deleteB);add(updateB);
+        add(id);add(name);add(length);add(semester);add(year);add(addB);add(search);add(deleteB);add(updateB);
         setLayout(new BorderLayout());
         setResizable(false);
         setLayout(new FlowLayout());
@@ -59,17 +64,18 @@ public class Courses extends JFrame{
 
     }
 
-    public static void addCourse(String id, String name , String length, String semester) throws Exception{
+    private void addCourse(String id, String name, float length, char semester, char year) throws Exception{
         try {
             searchCourse(id);
             if (coursesValArr.size() > 0) {
                 System.out.println("can't add existing course");
             } else {
-                PreparedStatement posted = coursesConn.prepareStatement("INSERT INTO COURSES_TABLE (ID, LENGTH, SEMESTER ,NAME) VALUES (?,?,?,?)");
+                PreparedStatement posted = coursesConn.prepareStatement("INSERT INTO COURSES_TABLE (ID, LENGTH, SEMESTER, YEAR ,NAME) VALUES (?,?,?,?,?)");
                 posted.setString(1, id);
-                posted.setString(2, length);
-                posted.setString(3, semester);
-                posted.setString(4, name);
+                posted.setFloat(2, length);
+                posted.setString(3, String.valueOf(semester));
+                posted.setString(4,String.valueOf(year));
+                posted.setString(5, name);
                 posted.executeLargeUpdate();
                 System.out.println("course added");
             }
@@ -78,7 +84,7 @@ public class Courses extends JFrame{
         }
     }
 
-    public static void searchCourse(String id) throws Exception {
+    private void searchCourse(String id) throws Exception {
         try {
             PreparedStatement searched = coursesConn.prepareStatement("SELECT * FROM COURSES_TABLE WHERE ID=?");
             searched.setString(1,id);
@@ -89,12 +95,7 @@ public class Courses extends JFrame{
         }
     }
 
-    public static void deleteCourse(String id) throws Exception {
-        PreparedStatement searched = coursesConn.prepareStatement("SELECT * FROM COLLAGE_TABLE WHERE COURSE_ID=?");
-        searched.setString(1,id);
-        ResultSet result = searched.executeQuery();
-        makeCourseArr(result);
-        if (coursesValArr.size() == 0){
+    private void deleteCourse(String id) throws Exception {
             PreparedStatement deleted = coursesConn.prepareStatement("DELETE  FROM COURSES_TABLE WHERE ID=?");
             deleted.setString(1,id);
             long t = deleted.executeLargeUpdate();
@@ -102,12 +103,9 @@ public class Courses extends JFrame{
                 System.out.println("row deleted");
             else
                 System.out.println("row didn't found");
-        }else
-            System.out.println("can't delete course which has class attached");
-        //need to delete first from Collage table*/
     }
 
-    private static void makeCourseArr(ResultSet r){
+    static void makeCourseArr(ResultSet r){
         try {
             coursesValArr = new ArrayList<>();
             while (r.next()){
@@ -115,48 +113,43 @@ public class Courses extends JFrame{
                 coursesValArr.add(r.getString("NAME"));
                 coursesValArr.add(r.getString("LENGTH"));
                 coursesValArr.add(r.getString("SEMESTER"));
+                coursesValArr.add(r.getString("YEAR"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public static void updateCourse(String id, String name , String length, String semester) throws Exception {
-        PreparedStatement searched = coursesConn.prepareStatement("SELECT * FROM COLLAGE_TABLE WHERE COURSE_ID=?");
-        searched.setString(1,id);
-        ResultSet result = searched.executeQuery();
-        makeCourseArr(result);
-        if(coursesValArr.size() == 0) {
-            PreparedStatement updated = coursesConn.prepareStatement("UPDATE COURSES_TABLE SET NAME=?, LENGTH=?, SEMESTER=? WHERE ID=?");
+    private void updateCourse(String id, String name, float length, char semester, char year) throws Exception {
+            PreparedStatement updated = coursesConn.prepareStatement("UPDATE COURSES_TABLE SET NAME=?, LENGTH=?, SEMESTER=?, YEAR=? WHERE ID=?");
             updated.setString(1,name);
-            updated.setString(2,length);
-            updated.setString(3,semester);
-            updated.setString(4,id);
+            updated.setFloat(2,length);
+            updated.setString(3,String.valueOf(semester));
+            updated.setString(4,String.valueOf(year));
+            updated.setString(5,id);
             long t = updated.executeLargeUpdate();
             if (t>0)
                 System.out.println("row updated");
             else
                 System.out.println("row didn't found");
-        } else
-            System.out.println("can't update lecturer which have course attached");
-        //need to update collage table first*/
-
     }
 
-    public  void clear(){
-        id.setText("");name.setText("");length.setText("");semester.setText("");
+    private void clear(){
+        id.setText("");name.setText("");length.setText("");semester.setText("");year.setText("");
     }
 
     private class ButtonClickListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             String command = e.getActionCommand();
-            String n = name.getText(), l = length.getText(), s = semester.getText(), i = id.getText();
+            String n = name.getText(), i = id.getText();
+            String l = length.getText();
+            String s = semester.getText(), y = year.getText();
             switch (command) {
                 case "add":
                     try {
-                        if(validation(i) && validation(n) && s.length()==1 && validateLength(l)) {
-                            addCourse(i, n, l, s);
+                        if(validation(i) && validation(n)&& validateDif(Float.parseFloat(l),y.charAt(0),s.charAt(0))) {
+                            addCourse(i, n, Float.parseFloat(l), s.charAt(0), y.charAt(0));
                         } else
                             System.out.println("please fix inputs");
                     } catch (Exception e1) {
@@ -173,6 +166,7 @@ public class Courses extends JFrame{
                                 name.setText(coursesValArr.get(1));
                                 length.setText(coursesValArr.get(2));
                                 semester.setText(coursesValArr.get(3));
+                                year.setText(coursesValArr.get(4));
                             } else
                                 System.out.println("no record");
                         } else
@@ -195,8 +189,8 @@ public class Courses extends JFrame{
                     break;
                 case "update":
                     try {
-                        if (validation(i) && validation(n) && validation(s) && validateLength(l))
-                            updateCourse(i,n,l,s);
+                        if (validation(i) && validation(n) && validateDif(Float.parseFloat(l), y.charAt(0), s.charAt(0)))
+                            updateCourse(i,n,Float.parseFloat(l),s.charAt(0),y.charAt(0));
                         else
                             System.out.println("please fix inputs");
                     } catch (Exception e1) {
@@ -210,16 +204,8 @@ public class Courses extends JFrame{
     private boolean validation(String n){
         return n.length() > 0 && n.length() < 15;
     }
-    private boolean validateLength(String l){
-        String hours,minutes;
-        int h,m;
-        if(l.length() == 5 && l.charAt(2) == ':') {
-            hours = l.substring(0, 2);
-            h = Integer.parseInt(hours);
-            minutes = l.substring(3, 5);
-            m = Integer.parseInt(minutes);
-            return !(h == 0 && h == m) && h>=0 && h <= 12 && h >= 0 && m < 60 && m >= 0;
-        } else
-            return false;
+
+    private boolean validateDif(float l, char y, char s){
+        return l > 1 && l < 10 && (y == 'A'||y == 'B'||y== 'C'||y=='D'||y=='a'||y=='b'||y=='c'||y=='d') && (s == 'A'||s == 'B'||s == 'S'||s=='a'||s=='b'||s=='s');
     }
 }

@@ -1,3 +1,5 @@
+package com.sql;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -5,12 +7,15 @@ import java.sql.*;
 import java.util.ArrayList;
 import javax.swing.*;
 
+import static com.sql.GlobalFunctions.Arr;
+import static com.sql.GlobalFunctions.searchInCollage;
+
 class ClassRoom extends JFrame {
     private JTextField number;
     private JTextField building;
     private JTextField floor;
     private static Connection classCon;
-    private static ArrayList<String> cValArr = new ArrayList<>();
+    static ArrayList<String> cValArr = new ArrayList<>();
 
 
     public ClassRoom(Connection conn) throws HeadlessException {
@@ -89,7 +94,7 @@ class ClassRoom extends JFrame {
             e.printStackTrace();
         }
     }
-    private static void makeClassArr(ResultSet r){
+    static void makeClassArr(ResultSet r){
         try {
             cValArr = new ArrayList<>();
             while (r.next()){
@@ -102,11 +107,6 @@ class ClassRoom extends JFrame {
         }
     }
     private static void deleteClass(String n) throws Exception {
-        PreparedStatement searched = classCon.prepareStatement("SELECT * FROM COLLAGE_TABLE WHERE CLASS=?");
-        searched.setString(1,n);
-        ResultSet result = searched.executeQuery();
-        makeClassArr(result);
-        if(cValArr.size() == 0) {
             PreparedStatement deleted = classCon.prepareStatement("DELETE  FROM CLASS_TABLE WHERE CLASS=?");
             deleted.setString(1,n);
             long t = deleted.executeLargeUpdate();
@@ -114,17 +114,9 @@ class ClassRoom extends JFrame {
                 System.out.println("row deleted");
              else
                  System.out.println("row didn't found");
-        }else
-            System.out.println("can't delete class which have course attached");
-            //need to delete first from Collage table
     }
 
     private static void updateClass(String b, String n, String f) throws Exception {
-        PreparedStatement searched = classCon.prepareStatement("SELECT * FROM COLLAGE_TABLE WHERE CLASS=?");
-        searched.setString(1,n);
-        ResultSet result = searched.executeQuery();
-        makeClassArr(result);
-        if(cValArr.size() == 0) {
             PreparedStatement updated = classCon.prepareStatement("UPDATE CLASS_TABLE SET FLOOR=?,BUILDING=? WHERE CLASS=?");
             updated.setString(1,f);
             updated.setString(2,b);
@@ -134,9 +126,6 @@ class ClassRoom extends JFrame {
                 System.out.println("row updated");
              else
                 System.out.println("row didn't found");
-        } else
-            System.out.println("can't update class which have course attached");
-        //need to update collage table first
     }
     public class ButtonClickListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {

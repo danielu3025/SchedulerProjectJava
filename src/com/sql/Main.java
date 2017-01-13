@@ -1,16 +1,22 @@
+package com.sql;
+
 import java.sql.*;
+import java.util.Calendar;
 
 public class Main{
-     private static Connection con ;
+    static Connection con;
     public static void main(String[] args) throws Exception {
         connect();
         triggersCreator();
         if(con != null) {
-            //ClassRoom g = new ClassRoom(con);
-            Lecturer l = new Lecturer(con);
-            //Courses c = new Courses(con);
-            //Menu m = new Menu();
-
+            Collage c = new Collage(con);
+            //com.sql.ClassRoom g = new com.sql.ClassRoom(con);
+            //com.sql.Lecturer l = new com.sql.Lecturer(con);
+            //com.sql.Courses c = new com.sql.Courses(con);
+            //com.sql.Menu m = new com.sql.Menu();
+            //com.sql.LecturerQuery l = new com.sql.LecturerQuery(con);
+            //com.sql.ClassQuery c = new com.sql.ClassQuery(con);
+            //CollageRangeQuery c = new CollageRangeQuery(con);
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
                     triggerDist();

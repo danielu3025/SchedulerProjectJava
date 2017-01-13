@@ -1,3 +1,5 @@
+package com.sql;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -10,7 +12,7 @@ public class Menu  extends JFrame{
 
     private DefaultTableModel model = new DefaultTableModel();
 
-    private Object[] columns = {"Index", "Lecturer id", "Class num", "Course id", "Day", "Beginning"};
+    private Object[] columns = {"Index", "com.sql.Lecturer id", "Class num", "Course id", "Day", "Beginning"};
 
 
     private TableRowSorter<TableModel> rowSorter;

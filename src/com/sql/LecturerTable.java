@@ -1,3 +1,4 @@
+package com.sql;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -6,10 +7,7 @@ import java.awt.*;
 import java.sql.*;
 import java.util.Vector;
 
-//import static com.sun.tools.internal.xjc.reader.Ring.add;
-
-public class classQuery extends JFrame {
-
+public class LecturerTable extends JFrame {
     private JTable table = new JTable();
 
     private DefaultTableModel model = new DefaultTableModel();
@@ -25,7 +23,7 @@ public class classQuery extends JFrame {
     Object[] row = new Object[6];
     private String[][] data;
 
-    public classQuery(Connection con) throws HeadlessException, SQLException {
+    public LecturerTable(Connection con) throws HeadlessException, SQLException {
         conn = con;
         collage = new Collage(conn);
         model.setColumnIdentifiers(columns);
@@ -41,15 +39,14 @@ public class classQuery extends JFrame {
         setLayout(new FlowLayout());
         setResizable(false);
         setLayout(null);
-        setSize(700,430);
+        setSize(700,600);
         setTitle("Class query");
         setLocationRelativeTo(null);
 
         add(pane);
 
 
-        PreparedStatement searched = con.prepareStatement("SELECT LECTURER_ID,COURSE_ID,CLASS FROM COLLAGE_TABLE WHERE  CLASS IN(SELECT CLASS FROM CLASS_TABLE WHERE CLASS = ?)");
-        searched.setString(1,"1234");
+        PreparedStatement searched = con.prepareStatement("SELECT * FROM LECTURERS_TABLE");
         ResultSet result = searched.executeQuery();
 
         model = new DefaultTableModel(data,columns) {

@@ -1,3 +1,4 @@
+package com.sql;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -6,12 +7,11 @@ import java.awt.*;
 import java.sql.*;
 import java.util.Vector;
 
-public class lecturerQuery extends JFrame {
+public class LectPhones extends JFrame {
     private JTable table = new JTable();
-
     private DefaultTableModel model = new DefaultTableModel();
 
-    private Object[] columns = {"lecturer id","class number","cuorse id,day,time"};
+    private Object[] columns = {"class", "lecturer", "Course id"};
 
     Collage collage ;
 
@@ -22,7 +22,7 @@ public class lecturerQuery extends JFrame {
     Object[] row = new Object[6];
     private String[][] data;
 
-    public lecturerQuery(Connection con) throws HeadlessException, SQLException {
+    public LectPhones(Connection con) throws HeadlessException, SQLException {
         conn = con;
         collage = new Collage(conn);
         model.setColumnIdentifiers(columns);
@@ -38,15 +38,14 @@ public class lecturerQuery extends JFrame {
         setLayout(new FlowLayout());
         setResizable(false);
         setLayout(null);
-        setSize(700,430);
-        setTitle("Teacher query");
+        setSize(700,600);
+        setTitle("Class query");
         setLocationRelativeTo(null);
 
         add(pane);
 
-
-        PreparedStatement searched = con.prepareStatement("SELECT LECTURER_ID,COURSE_ID,CLASS,DAY,BEGINNING FROM COLLAGE_TABLE WHERE  LECTURER_ID IN(SELECT ID FROM LECTURERS_TABLE WHERE ID = ?)");
-        searched.setString(1,"123");
+        //"SELECT NMAE,ID,(SELECT PHONE FORM PHONE_TABLE WHERE ID = LECTURERS_TABLE.ID) FROM LECTURERS_TABLE");
+        PreparedStatement searched = con.prepareStatement("SELECT ID,PHONE,(SELECT NAME FROM LECTURERS_TABLE WHERE ID = PHONE_TABLE.ID) FROM PHONE_TABLE");
         ResultSet result = searched.executeQuery();
 
         model = new DefaultTableModel(data,columns) {
