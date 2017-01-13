@@ -28,7 +28,7 @@ public class Lecturer  extends JFrame{
 
     public Lecturer(Connection con) throws HeadlessException, ParseException {
         lectConn = con;
-        id = new JTextField(" ",20);
+        id = new JTextField("",20);
         name = new JTextField("",20);
         lastName = new JTextField("",20);
         dob = new JTextField("",20);
@@ -39,7 +39,7 @@ public class Lecturer  extends JFrame{
         JButton delete = new JButton("delete");
         JButton updateB = new JButton("update");
         JButton showPhons = new JButton("show phones");
-        JButton showTeacher = new JButton("Lecturer table");
+        JButton showTeacher = new JButton("showTeacher");
         JButton TeachersPhons = new JButton("Teacher's Phons");
 
 
@@ -72,7 +72,7 @@ public class Lecturer  extends JFrame{
 
 
         setSize(500,500);
-        setTitle("com.sql.Lecturer");
+        setTitle("com.sql.com.sql.Lecturer");
         lbId.setBounds(30,10,100,20);
         id.setBounds(30,30,100,20);
 

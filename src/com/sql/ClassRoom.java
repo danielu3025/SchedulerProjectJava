@@ -7,8 +7,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import javax.swing.*;
 
-import static com.sql.GlobalFunctions.Arr;
-import static com.sql.GlobalFunctions.searchInCollage;
+//import static com.sql.GlobalFunctions.Arr;
+//import static com.sql.GlobalFunctions.searchInCollage;
 
 class ClassRoom extends JFrame {
     private JTextField number;
@@ -16,6 +16,7 @@ class ClassRoom extends JFrame {
     private JTextField floor;
     private static Connection classCon;
     static ArrayList<String> cValArr = new ArrayList<>();
+    JButton showClassroms;
 
 
     public ClassRoom(Connection conn) throws HeadlessException {
@@ -23,6 +24,11 @@ class ClassRoom extends JFrame {
         number = new JTextField("class number",20);
         building = new JTextField("building",20);
         floor = new JTextField("floor",20);
+        JLabel lbNum = new JLabel("classroom Num");
+        JLabel lbBuilding = new JLabel("building Num");
+        JLabel lbFloor = new JLabel("floor Num");
+
+        showClassroms = new JButton("show Classrooms");
 
 
         JButton addB = new JButton("add");
@@ -35,27 +41,40 @@ class ClassRoom extends JFrame {
         search.setActionCommand("search");
         delete.setActionCommand("delete");
         updateB.setActionCommand("update");
+        showClassroms.setActionCommand("s");
+
 
         addB.addActionListener(new ButtonClickListener());
         search.addActionListener(new ButtonClickListener());
         delete.addActionListener(new ButtonClickListener());
         updateB.addActionListener(new ButtonClickListener());
+        showClassroms.addActionListener(new ButtonClickListener());
+
 
 
 
         setSize(500,500);
-        setTitle("Class");
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        number.setBounds(30,10,100,20);
-        building.setBounds(30,40,100,20);
-        floor.setBounds(30,70,100,20);
-        addB.setBounds(30,100,100,20);
-        search.setBounds(160,100,100,20);
-        delete.setBounds(280,100,100,20);
-        updateB.setBounds(30,130,100,20);
+        setTitle("ClassRoom");
+
+        lbNum.setBounds(30,10,100,20);
+        number.setBounds(30,40,100,20);
+
+        lbBuilding.setBounds(30,70,100,20);
+        building.setBounds(30,100,100,20);
+
+        lbFloor.setBounds(30,130,100,20);
+        floor.setBounds(30,160,100,20);
+
+
+
+        addB.setBounds(30,200,100,20);
+        search.setBounds(160,200,100,20);
+        delete.setBounds(280,200,100,20);
+        updateB.setBounds(30,230,100,20);
 
 
         add(number);add(building);add(floor);add(addB);add(search);add(delete);add(updateB);
+        add(lbNum);add(lbBuilding);add(lbFloor);
         setLayout(new BorderLayout());
         setResizable(false);
         setLayout(new FlowLayout());
@@ -182,6 +201,8 @@ class ClassRoom extends JFrame {
                         e1.printStackTrace();
                     }
                     break;
+                case "s":
+
             }
         }
     }

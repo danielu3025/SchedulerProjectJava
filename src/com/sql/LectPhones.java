@@ -1,4 +1,5 @@
 package com.sql;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -13,7 +14,6 @@ public class LectPhones extends JFrame {
 
     private Object[] columns = {"class", "lecturer", "Course id"};
 
-    Collage collage ;
 
     Connection conn ;
 
@@ -24,7 +24,6 @@ public class LectPhones extends JFrame {
 
     public LectPhones(Connection con) throws HeadlessException, SQLException {
         conn = con;
-        collage = new Collage(conn);
         model.setColumnIdentifiers(columns);
         table.setModel(model);
 

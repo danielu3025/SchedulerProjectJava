@@ -5,10 +5,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import static com.sql.Main.con;
 
 class GlobalFunctions {
-    static ArrayList<String> Arr = new ArrayList<>();
+/*    static ArrayList<String> Arr = new ArrayList<>();
 
     static void searchInCollage(String res, String val) throws Exception {
         try {
@@ -53,5 +52,5 @@ class GlobalFunctions {
             e.printStackTrace();
         }
 
-    }
+    }*/
 }

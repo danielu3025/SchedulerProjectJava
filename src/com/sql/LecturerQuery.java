@@ -23,13 +23,12 @@ public class LecturerQuery extends JFrame {
 
     public LecturerQuery(Connection con) throws HeadlessException, SQLException {
         conn = con;
-        Collage collage = new Collage(conn);
         model = new DefaultTableModel();
         model.setColumnIdentifiers(columns);
         table = new JTable();
         table.setModel(model);
         JButton search = new JButton("search");
-        id = new JTextField("com.sql.Lecturer id",20);
+        id = new JTextField("com.sql.com.sql.Lecturer id",20);
         table.setRowHeight(30);
 
         JScrollPane pane = new JScrollPane(table);

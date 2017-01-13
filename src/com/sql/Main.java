@@ -1,22 +1,19 @@
 package com.sql;
 
 import java.sql.*;
-import java.util.Calendar;
 
 public class Main{
-    static Connection con;
+     private static Connection con ;
     public static void main(String[] args) throws Exception {
         connect();
         triggersCreator();
         if(con != null) {
-            Collage c = new Collage(con);
             //com.sql.ClassRoom g = new com.sql.ClassRoom(con);
-            //com.sql.Lecturer l = new com.sql.Lecturer(con);
-            //com.sql.Courses c = new com.sql.Courses(con);
+            //Lecturer l = new Lecturer(con);
+             //Courses c = new Courses(con);
             //com.sql.Menu m = new com.sql.Menu();
-            //com.sql.LecturerQuery l = new com.sql.LecturerQuery(con);
-            //com.sql.ClassQuery c = new com.sql.ClassQuery(con);
-            //CollageRangeQuery c = new CollageRangeQuery(con);
+            Gui g = new Gui(con);
+
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
                     triggerDist();
@@ -39,6 +36,7 @@ public class Main{
             System.out.println("connected succeed");
 
 
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -54,7 +52,6 @@ public class Main{
             trigger3.executeLargeUpdate();
             PreparedStatement trigger4 = con.prepareStatement("CREATE TRIGGER LECT_DELETE BEFORE DELETE ON LECTURERS_TABLE FOR EACH ROW BEGIN DELETE FROM COLLAGE_TABLE WHERE LECTURER_ID = old.ID;END ");
             trigger4.executeLargeUpdate();
-
         }catch (Exception e){
             e.printStackTrace();
         }

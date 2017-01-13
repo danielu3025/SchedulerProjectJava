@@ -27,7 +27,6 @@ public class ClassQuery extends JFrame {
 
     ClassQuery(Connection con) throws HeadlessException, SQLException {
         conn = con;
-        Collage collage = new Collage(conn);
         model = new DefaultTableModel();
         model.setColumnIdentifiers(columns);
         table = new JTable();

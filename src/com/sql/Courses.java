@@ -16,16 +16,25 @@ public class Courses extends JFrame{
     private JTextField length;
     private JTextField year;
     private JTextField semester;
+    private JButton showC;
     static ArrayList<String> coursesValArr = new ArrayList<>();
     private static Connection coursesConn;
 
     public Courses(Connection con) {
         coursesConn = con;
-        id = new JTextField("course id",15);
-        name = new JTextField("name",15);
-        length = new JTextField("length: 2.5",4);
-        semester = new JTextField("semester",1);
-        year = new JTextField("year - yyyy",4);
+        id = new JTextField("",15);
+        name = new JTextField("",15);
+        length = new JTextField("",4);
+        semester = new JTextField("",4);
+        year = new JTextField("",4);
+        showC = new JButton("");
+
+        JLabel lbID = new JLabel("course id");
+        JLabel lbname = new JLabel("name");
+        JLabel lblength = new JLabel("length: 2.5");
+        JLabel lbsemester = new JLabel("semester");
+        JLabel lbyear = new JLabel("year - yyyy");
+
 
         JButton addB = new JButton("add");
         JButton search = new JButton("search");
@@ -36,26 +45,42 @@ public class Courses extends JFrame{
         search.setActionCommand("search");
         deleteB.setActionCommand("delete");
         updateB.setActionCommand("update");
+        showC.setActionCommand("C");
 
         addB.addActionListener(new ButtonClickListener());
         search.addActionListener(new ButtonClickListener());
         deleteB.addActionListener(new ButtonClickListener());
         updateB.addActionListener(new ButtonClickListener());
+        showC.addActionListener(new ButtonClickListener());
+
 
         setSize(500,500);
-        setTitle("com.sql.Courses");
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        id.setBounds(30,10,100,20);
-        name.setBounds(30,40,100,20);
-        length.setBounds(30,70,100,20);
-        semester.setBounds(30,100,100,20);
-        year.setBounds(30,130,100,20);
+        setTitle("Course Form");
+
+        lbID.setBounds(30,10,100,20);
+        id.setBounds(30,40,100,20);
+
+        lbname.setBounds(30,70,100,20);
+        name.setBounds(30,100,100,20);
+
+        lblength.setBounds(30,130,100,20);
+        length.setBounds(30,160,100,20);
+
+        lbsemester.setBounds(30,190,100,20);
+        semester.setBounds(30,250,100,20);
+
+        lbyear.setBounds(30,290,100,20);
+        year.setBounds(30,330,100,20);
+
         addB.setBounds(160,130,100,20);
         search.setBounds(160,100,100,20);
         deleteB.setBounds(280,100,100,20);
         updateB.setBounds(280,130,100,20);
 
+        showC.setBounds(160,200,100,20);
+
         add(id);add(name);add(length);add(semester);add(year);add(addB);add(search);add(deleteB);add(updateB);
+        add(lbID);add(lbname);add(lbsemester);add(lblength);add(lbyear); add(showC);
         setLayout(new BorderLayout());
         setResizable(false);
         setLayout(new FlowLayout());
@@ -121,17 +146,28 @@ public class Courses extends JFrame{
     }
 
     private void updateCourse(String id, String name, float length, char semester, char year) throws Exception {
-            PreparedStatement updated = coursesConn.prepareStatement("UPDATE COURSES_TABLE SET NAME=?, LENGTH=?, SEMESTER=?, YEAR=? WHERE ID=?");
-            updated.setString(1,name);
-            updated.setFloat(2,length);
-            updated.setString(3,String.valueOf(semester));
-            updated.setString(4,String.valueOf(year));
-            updated.setString(5,id);
-            long t = updated.executeLargeUpdate();
-            if (t>0)
-                System.out.println("row updated");
-            else
-                System.out.println("row didn't found");
+            coursesConn.setAutoCommit(false);
+            try{
+                PreparedStatement updated = coursesConn.prepareStatement("UPDATE COURSES_TABLE SET NAME=?, LENGTH=?, SEMESTER=?, YEAR=? WHERE ID=?");
+                updated.setString(1,name);
+                updated.setFloat(2,length);
+                updated.setString(3,String.valueOf(semester));
+                updated.setString(4,String.valueOf(year));
+                updated.setString(5,id);
+                System.out.println("redt to transucion");
+                coursesConn.commit();
+                long t = updated.executeLargeUpdate();
+                if (t>0)
+                    System.out.println("row updated");
+                else
+                    System.out.println("row didn't found");
+
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            finally {
+                coursesConn.setAutoCommit(false);
+            }
     }
 
     private void clear(){
@@ -198,6 +234,8 @@ public class Courses extends JFrame{
                     }
                     clear();
                     break;
+                case "C":
+                    Courses c = new Courses(coursesConn);
             }
         }
     }

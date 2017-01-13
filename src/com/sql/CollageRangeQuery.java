@@ -25,7 +25,6 @@ public class CollageRangeQuery extends JFrame {
 
     public CollageRangeQuery(Connection con) throws HeadlessException, SQLException {
         conn = con;
-        Collage collage = new Collage(conn);
         model = new DefaultTableModel();
         model.setColumnIdentifiers(columns);
         table = new JTable();
