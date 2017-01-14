@@ -28,7 +28,7 @@ public class LecturerQuery extends JFrame {
         table = new JTable();
         table.setModel(model);
         JButton search = new JButton("search");
-        id = new JTextField("com.sql.com.sql.Lecturer id",20);
+        id = new JTextField("Lecturer id",20);
         table.setRowHeight(30);
 
         JScrollPane pane = new JScrollPane(table);

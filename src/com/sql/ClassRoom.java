@@ -24,9 +24,9 @@ class ClassRoom extends JFrame {
         number = new JTextField("class number",20);
         building = new JTextField("building",20);
         floor = new JTextField("floor",20);
-        JLabel lbNum = new JLabel("classroom Num");
-        JLabel lbBuilding = new JLabel("building Num");
-        JLabel lbFloor = new JLabel("floor Num");
+        JLabel lbNum = new JLabel("classroom Num 1-15#");
+        JLabel lbBuilding = new JLabel("building Num 1-15#");
+        JLabel lbFloor = new JLabel("floor Num 1-15#");
 
         showClassroms = new JButton("show Classrooms");
 
@@ -53,16 +53,17 @@ class ClassRoom extends JFrame {
 
 
 
+
         setSize(500,500);
         setTitle("ClassRoom");
 
-        lbNum.setBounds(30,10,100,20);
+        lbNum.setBounds(30,10,150,20);
         number.setBounds(30,40,100,20);
 
-        lbBuilding.setBounds(30,70,100,20);
+        lbBuilding.setBounds(30,70,150,20);
         building.setBounds(30,100,100,20);
 
-        lbFloor.setBounds(30,130,100,20);
+        lbFloor.setBounds(30,130,150,20);
         floor.setBounds(30,160,100,20);
 
 
@@ -71,10 +72,11 @@ class ClassRoom extends JFrame {
         search.setBounds(160,200,100,20);
         delete.setBounds(280,200,100,20);
         updateB.setBounds(30,230,100,20);
+        showClassroms.setBounds(160,230,200,20);
 
 
         add(number);add(building);add(floor);add(addB);add(search);add(delete);add(updateB);
-        add(lbNum);add(lbBuilding);add(lbFloor);
+        add(lbNum);add(lbBuilding);add(lbFloor);add(showClassroms);
         setLayout(new BorderLayout());
         setResizable(false);
         setLayout(new FlowLayout());
@@ -90,14 +92,14 @@ class ClassRoom extends JFrame {
         try {
             searchClass(n);
             if (cValArr.size()>0){
-                System.out.println("class already exist");
+                JOptionPane.showMessageDialog(null,"class already exist");
             }else {
                 PreparedStatement posted = classCon.prepareStatement("INSERT INTO CLASS_TABLE (BUILDING, CLASS, FLOOR) VALUES (?,?,?)");
                 posted.setString(1,b);
                 posted.setString(2,n);
                 posted.setString(3,f);
                 posted.executeLargeUpdate();
-                System.out.println("class added");
+                JOptionPane.showMessageDialog(null,"class added");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -126,25 +128,38 @@ class ClassRoom extends JFrame {
         }
     }
     private static void deleteClass(String n) throws Exception {
-            PreparedStatement deleted = classCon.prepareStatement("DELETE  FROM CLASS_TABLE WHERE CLASS=?");
-            deleted.setString(1,n);
-            long t = deleted.executeLargeUpdate();
-            if (t>0)
-                System.out.println("row deleted");
-             else
-                 System.out.println("row didn't found");
+            classCon.setAutoCommit(false);
+            try {
+                PreparedStatement deleted = classCon.prepareStatement("DELETE  FROM CLASS_TABLE WHERE CLASS=?");
+                deleted.setString(1,n);
+                classCon.commit();
+                long t = deleted.executeLargeUpdate();
+                if (t>0)
+                    JOptionPane.showMessageDialog(null,"row deleted");
+                else
+                    JOptionPane.showMessageDialog(null,"row didn't found");
+
+            }catch (Exception e){
+                e.printStackTrace();
+                classCon.rollback();
+            }
+            finally {
+                classCon.setAutoCommit(true);
+            }
     }
 
     private static void updateClass(String b, String n, String f) throws Exception {
+
             PreparedStatement updated = classCon.prepareStatement("UPDATE CLASS_TABLE SET FLOOR=?,BUILDING=? WHERE CLASS=?");
             updated.setString(1,f);
             updated.setString(2,b);
             updated.setString(3,n);
             long t = updated.executeLargeUpdate();
             if (t>0)
-                System.out.println("row updated");
+                JOptionPane.showMessageDialog(null,"row updated");
              else
-                System.out.println("row didn't found");
+                JOptionPane.showMessageDialog(null,"row didn't found");
+
     }
     public class ButtonClickListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
@@ -157,7 +172,7 @@ class ClassRoom extends JFrame {
                             addClass(b,n,f);
                             clear();
                         } else
-                            System.out.println("please fix the inputs");
+                            JOptionPane.showMessageDialog(null,"please fix the inputs");
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
@@ -172,9 +187,9 @@ class ClassRoom extends JFrame {
                                 floor.setText(cValArr.get(2));
                                 System.out.println("filled all records");
                             } else
-                                System.out.println("no record");
+                                JOptionPane.showMessageDialog(null,"no record");
                         }else
-                            System.out.println("please fix class number");
+                            JOptionPane.showMessageDialog(null,"please fix class number");
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
@@ -185,7 +200,7 @@ class ClassRoom extends JFrame {
                             deleteClass(n);
                             clear();
                         } else
-                            System.out.println("please fix class number");
+                            JOptionPane.showMessageDialog(null,"please fix class number");
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
@@ -196,12 +211,17 @@ class ClassRoom extends JFrame {
                             updateClass(b, n, f);
                             clear();
                         } else
-                            System.out.println("please fix the inputs");
+                            JOptionPane.showMessageDialog(null,"please fix the inputs");
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
                     break;
                 case "s":
+                    try {
+                        ClassroomTable crt = new ClassroomTable(classCon);
+                    } catch (SQLException e1) {
+                        e1.printStackTrace();
+                    }
 
             }
         }

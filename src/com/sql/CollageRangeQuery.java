@@ -13,7 +13,7 @@ import java.util.Vector;
 public class CollageRangeQuery extends JFrame {
     private Connection conn;
     private DefaultTableModel model;
-    private Object[] columns = {"LECTURER_ID", "CLASS_NUMBER", "COURSE_ID", "DAY", "BEGINNING"};
+    private Object[] columns = {"LECTURER_ID","COURSE_ID", "CLASS", "DAY", "BEGINNING","END"};
     private JTable table;
     private TableRowSorter<TableModel> rowSorter;
     Object[] row = new Object[6];
@@ -49,7 +49,7 @@ public class CollageRangeQuery extends JFrame {
         setResizable(false);
         setLayout(null);
         setSize(700, 430);
-        setTitle("Teacher query");
+        setTitle("Range query");
         setLocationRelativeTo(null);
 
         add(pane);
@@ -71,11 +71,10 @@ public class CollageRangeQuery extends JFrame {
             if (command.equals("search")) {
                 try {
                     String sD = startDay.getText(), sH = startHour.getText(), eD = endDay.getText(), eH = endHour.getText();
-                    PreparedStatement searched = conn.prepareStatement("SELECT LECTURER_ID,COURSE_ID,CLASS,DAY,BEGINNING FROM COLLAGE_TABLE WHERE DAY >= ? AND DAY <= ? AND BEGINNING >= ? AND BEGINNING <= ?");
+                    PreparedStatement searched = conn.prepareStatement("SELECT LECTURER_ID,COURSE_ID,CLASS,DAY,BEGINNING,END FROM COLLAGE_TABLE WHERE DAY >= ? AND DAY <= ?");
                     searched.setString(1, sD);
                     searched.setString(2, eD);
-                    searched.setString(3, sH);
-                    searched.setString(4, eH);
+
                     ResultSet result = searched.executeQuery();
 
                     model = new DefaultTableModel(data, columns) {
@@ -85,7 +84,7 @@ public class CollageRangeQuery extends JFrame {
                         }
                     };
 
-                    table.setModel(buildTableModel(result));
+                    table.setModel(buildTableModel(result,Float.parseFloat(sH),Float.parseFloat(eH)));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -93,7 +92,7 @@ public class CollageRangeQuery extends JFrame {
         }
     }
 
-    public static DefaultTableModel buildTableModel(ResultSet rs) throws SQLException {
+    public static DefaultTableModel buildTableModel(ResultSet rs,float st,float en) throws SQLException {
 
         ResultSetMetaData metaData = rs.getMetaData();
 
@@ -111,7 +110,10 @@ public class CollageRangeQuery extends JFrame {
             for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
                 vector.add(rs.getObject(columnIndex));
             }
-            data.add(vector);
+            float t1 = Float.parseFloat(vector.elementAt(4).toString());
+            float t2 = Float.parseFloat(vector.elementAt(5).toString());
+            if((t1 >=st && t1 <=en) || (t2>=st && t2 <=en))
+                data.add(vector);
         }
 
         return new DefaultTableModel(data, columnNames);

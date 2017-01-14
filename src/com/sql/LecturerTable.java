@@ -39,7 +39,7 @@ public class LecturerTable extends JFrame {
         setResizable(false);
         setLayout(null);
         setSize(700,600);
-        setTitle("Class query");
+        setTitle("Lectuer Table");
         setLocationRelativeTo(null);
 
         add(pane);

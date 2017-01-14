@@ -39,7 +39,7 @@ public class PhoneTable extends JFrame {
         setResizable(false);
         setLayout(null);
         setSize(700,600);
-        setTitle("Class query");
+        setTitle("phone Table");
         setLocationRelativeTo(null);
 
         add(pane);

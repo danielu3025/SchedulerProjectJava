@@ -38,13 +38,13 @@ public class LectPhones extends JFrame {
         setResizable(false);
         setLayout(null);
         setSize(700,600);
-        setTitle("Class query");
+        setTitle("Phone Table");
         setLocationRelativeTo(null);
 
         add(pane);
 
         //"SELECT NMAE,ID,(SELECT PHONE FORM PHONE_TABLE WHERE ID = LECTURERS_TABLE.ID) FROM LECTURERS_TABLE");
-        PreparedStatement searched = con.prepareStatement("SELECT ID,PHONE,(SELECT NAME FROM LECTURERS_TABLE WHERE ID = PHONE_TABLE.ID) FROM PHONE_TABLE");
+        PreparedStatement searched = con.prepareStatement("SELECT ID,(SELECT NAME FROM LECTURERS_TABLE WHERE ID = PHONE_TABLE.ID),(SELECT LAST_NAME FROM LECTURERS_TABLE WHERE ID = PHONE_TABLE.ID),PHONE FROM PHONE_TABLE");
         ResultSet result = searched.executeQuery();
 
         model = new DefaultTableModel(data,columns) {

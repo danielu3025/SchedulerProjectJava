@@ -55,7 +55,8 @@ public class Gui extends JFrame {
         setResizable(false);
         setLayout(null);
         setSize(400,750);
-        setTitle("Scheduler");
+        setTitle("Scheduler APP");
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setVisible(true);
     }
@@ -103,7 +104,6 @@ public class Gui extends JFrame {
 
             }
             if (command == "s"){
-                Menu sched = new Menu();
                 Collage c = new Collage(conn);
             }
         }

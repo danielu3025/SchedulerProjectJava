@@ -8,7 +8,8 @@ import java.awt.*;
 import java.sql.*;
 import java.util.Vector;
 
-public class CoursesTable extends JFrame {
+
+class ClassroomTable extends JFrame {
     private JTable table = new JTable();
 
     private DefaultTableModel model = new DefaultTableModel();
@@ -23,7 +24,7 @@ public class CoursesTable extends JFrame {
     Object[] row = new Object[6];
     private String[][] data;
 
-    public CoursesTable(Connection con) throws HeadlessException, SQLException {
+    public ClassroomTable(Connection con) throws HeadlessException, SQLException {
         conn = con;
         model.setColumnIdentifiers(columns);
         table.setModel(model);
@@ -39,13 +40,13 @@ public class CoursesTable extends JFrame {
         setResizable(false);
         setLayout(null);
         setSize(700,600);
-        setTitle("Courses Table");
+        setTitle("Classrooms Table");
         setLocationRelativeTo(null);
 
         add(pane);
 
 
-        PreparedStatement searched = con.prepareStatement("SELECT * FROM COURSES_TABLE");
+        PreparedStatement searched = con.prepareStatement("SELECT * FROM CLASS_TABLE");
         ResultSet result = searched.executeQuery();
 
         model = new DefaultTableModel(data,columns) {

@@ -20,50 +20,74 @@ public class Collage extends JFrame {
     private JTextField clNum;
     private JTextField day;
     private JTextField begin;
-    private static String sLID="",sCID="",sCNUM="",sDay="",sBegin="";
+    private static String sLID="",sCID="",sCNUM="",sDay="",sBegin="",sEnd="",sTableID="";
     private static ArrayList<String> valArr = new ArrayList<>();
     private static ArrayList<ArrayList<String>> qarr = new ArrayList<ArrayList<String>>();
     private static Connection conn;
 
     Collage(Connection con) throws HeadlessException {
         conn = con;
-        lID = new JTextField("Lecturer ID",20);
-        cID = new JTextField("course ID",20);
-        clNum = new JTextField("Class num",20);
-        day = new JTextField("Day - sun",3);
-        begin = new JTextField("Begin",3);
+        lID = new JTextField("",20);
+        cID = new JTextField("",20);
+        clNum = new JTextField("",20);
+        day = new JTextField("",4);
+        begin = new JTextField("",4);
         JButton addB = new JButton("add");
         JButton search = new JButton("search");
         JButton delete = new JButton("delete");
         JButton updateB = new JButton("update");
+        JButton showTable = new JButton("show Table");
+
+        JLabel lbID = new JLabel("LecturerID 1-15#");
+        JLabel lbCid = new JLabel("courseID 1-15#");
+        JLabel lbCnum = new JLabel("Class num 1-15#");
+        JLabel lbDay = new JLabel("Day-1-6:");
+        JLabel lbBeg = new JLabel("Begin 8-20:");
+
 
         addB.setActionCommand("add");
         search.setActionCommand("search");
         delete.setActionCommand("delete");
         updateB.setActionCommand("update");
+        showTable.setActionCommand("s");
 
         addB.addActionListener(new ButtonClickListener());
         search.addActionListener(new ButtonClickListener());
         delete.addActionListener(new ButtonClickListener());
         updateB.addActionListener(new ButtonClickListener());
+        showTable.addActionListener(new ButtonClickListener());
+
 
 
 
         setSize(500,500);
-        setTitle("scheduler Table");
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        lID.setBounds(30,10,100,20);
-        cID.setBounds(30,40,100,20);
-        clNum.setBounds(30,70,100,20);
-        day.setBounds(30,100,100,20);
-        begin.setBounds(30,130,100,20);
-        addB.setBounds(160,130,100,20);
-        search.setBounds(160,100,100,20);
-        delete.setBounds(280,100,100,20);
-        updateB.setBounds(280,130,100,20);
+        setTitle("scheduler");
+        lbID.setBounds(30,10,150,20);
+        lID.setBounds(30,35,100,20);
+
+        lbCid.setBounds(30,65,150,20);
+        cID.setBounds(30,90,100,20);
+
+        lbCnum.setBounds(30,115,150,20);
+        clNum.setBounds(30,140,100,20);
+
+        lbDay.setBounds(30,165,150,20);
+        day.setBounds(30,182,100,20);
+
+        lbBeg.setBounds(30,205,150,20);
+        begin.setBounds(30,230,100,20);
+
+
+        search.setBounds(160,230,100,20);
+        addB.setBounds(160,260,100,20);
+        delete.setBounds(280,230,100,20);
+        updateB.setBounds(280,260,100,20);
+        showTable.setBounds(160,300,220,20);
+
 
 
         add(lID);add(cID);add(clNum);add(day);add(begin);add(addB);add(search);add(delete);add(updateB);
+        add(lbBeg);add(lbCid);add(lbCnum);add(lbDay);add(lbID);add(showTable);
         setLayout(new BorderLayout());
         setResizable(false);
         setLayout(new FlowLayout());
@@ -86,48 +110,59 @@ public class Collage extends JFrame {
         begin.setText("");
     }
     private static void addToCollage(String lid, String cid, String classnum, String day, String beginning) throws Exception{
+        conn.setAutoCommit(false);
         boolean test = false;
-        try {
+        boolean check;
+        try{
             PreparedStatement search = conn.prepareStatement("SELECT * FROM LECTURERS_TABLE WHERE ID =?");
-            search.setString(1,lid);
+            search.setString(1, lid);
             ResultSet r = search.executeQuery();
             makeLectArr(r);
-            if(lValArr.size()>0) {
+            if (lValArr.size() > 0) {
                 search = conn.prepareStatement("SELECT * FROM CLASS_TABLE WHERE CLASS = ?");
-                search.setString(1,classnum);
+                search.setString(1, classnum);
                 r = search.executeQuery();
                 makeClassArr(r);
-                if(cValArr.size()>0) {
+                if (cValArr.size() > 0) {
                     search = conn.prepareStatement("SELECT * FROM COURSES_TABLE WHERE ID = ?");
-                    search.setString(1,cid);
+                    search.setString(1, cid);
                     r = search.executeQuery();
                     makeCourseArr(r);
-                    if(coursesValArr.size()>0){
-                        float end = Float.parseFloat(coursesValArr.get(2));
-                        end += Float.parseFloat(beginning);
-                        if(validateEnd(end)) {
-                            PreparedStatement posted = conn.prepareStatement("INSERT INTO COLLAGE_TABLE (LECTURER_ID, COURSE_ID, CLASS, DAY, BEGINNING, END) VALUES (?,?,?,?,?,?)");
-                            posted.setString(1, lid);
-                            posted.setString(2, cid);
-                            posted.setString(3, classnum);
-                            posted.setInt(4, Integer.parseInt(day));
-                            posted.setFloat(5, Float.parseFloat(beginning));
-                            posted.setFloat(6, end);
-                            //data validation
-                            long t = posted.executeLargeUpdate();
-                            if (t > 0) {
-                                System.out.println("row created");
-                                test = true;
-                            } else
-                                System.out.println("something went wrong");
-                        } else {
-                            System.out.println("can't update course due to course end time");
+                    if (coursesValArr.size() > 0) {
+                        float length = Float.parseFloat(coursesValArr.get(2));
+                        float end = length + Float.parseFloat(beginning);
+                        if (validateEnd(end)) {
+                            search = conn.prepareStatement("SELECT BEGINNING, DAY, LECTURER_ID, CLASS, TABLE_ID, END FROM COLLAGE_TABLE WHERE DAY = ?");
+                            search.setInt(1, Integer.parseInt(day));
+                            r = search.executeQuery();
+                            check = testHours(r, length, Float.parseFloat(beginning), end, lid, classnum, Integer.parseInt(day));
+                            if (check) {
+                                PreparedStatement posted = conn.prepareStatement("INSERT INTO COLLAGE_TABLE (LECTURER_ID, COURSE_ID, CLASS, DAY, BEGINNING, END) VALUES (?,?,?,?,?,?)");
+                                posted.setString(1, lid);
+                                posted.setString(2, cid);
+                                posted.setString(3, classnum);
+                                posted.setInt(4, Integer.parseInt(day));
+                                posted.setFloat(5, Float.parseFloat(beginning));
+                                posted.setFloat(6, end);
+                                //data validation
+                                long t = posted.executeLargeUpdate();
+                                if (t > 0) {
+                                    System.out.println("row created");
+                                    test = true;
+                                } else
+                                    System.out.println("something went wrong");
+                            } else {
+                                System.out.println("can't update course due to course end time");
+                            }
                         }
                     }
                 }
             }
         } catch (Exception e) {
+            conn.rollback();
             e.printStackTrace();
+        } finally {
+            conn.setAutoCommit(true);
         }
         if (!test)
             System.out.println("please fix you new record data");
@@ -144,18 +179,31 @@ public class Collage extends JFrame {
         }
     }
     private static void deleteFromCollage(String lid, String cid, String classnum, String day, String beginning) throws Exception {
-        PreparedStatement deleted = conn.prepareStatement("DELETE FROM COLLAGE_TABLE WHERE LECTURER_ID = ? AND COURSE_ID= ? AND CLASS=? AND DAY= ?  AND BEGINNING= ?");
-        //delete from  all tables before;
-        deleted.setString(1,lid);
-        deleted.setString(2,cid);
-        deleted.setString(3,classnum);
-        deleted.setString(4,day);
-        deleted.setString(5,beginning);
-        long t = deleted.executeLargeUpdate();
-        if(t>0){
-            System.out.println("record deleted");
-        } else
-            System.out.println("record not found");
+        conn.setAutoCommit(false);
+        try {
+            PreparedStatement deleted = conn.prepareStatement("DELETE FROM COLLAGE_TABLE WHERE LECTURER_ID = ? AND COURSE_ID= ? AND CLASS=? AND DAY= ?  AND BEGINNING= ?");
+            //delete from  all tables before;
+            deleted.setString(1,lid);
+            deleted.setString(2,cid);
+            deleted.setString(3,classnum);
+            deleted.setString(4,day);
+            deleted.setString(5,beginning);
+            long t = deleted.executeLargeUpdate();
+            conn.commit();
+            if(t>0){
+                System.out.println("record deleted");
+            } else
+                System.out.println("record not found");
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            conn.rollback();
+            System.out.println("rollback");
+        }
+        finally {
+            conn.setAutoCommit(true);
+        }
+
     }
     private static void makeCollageArr(ResultSet r){
         try {
@@ -166,57 +214,106 @@ public class Collage extends JFrame {
                 valArr.add(r.getString("CLASS"));
                 valArr.add(r.getString("DAY"));
                 valArr.add(r.getString("BEGINNING"));
+                valArr.add(r.getString("END"));
+                valArr.add(r.getString("TABLE_ID"));
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+    private static boolean testHours(ResultSet r,float len, float beggin, float end, String lect, String clas, int d){
+        try {
+            coursesValArr = new ArrayList<>();
+            while (r.next()){
+                coursesValArr.add(r.getString("BEGINNING"));
+                coursesValArr.add(r.getString("DAY"));
+                coursesValArr.add(r.getString("LECTURER_ID"));
+                coursesValArr.add(r.getString("CLASS"));
+                coursesValArr.add(r.getString("TABLE_ID"));
+                coursesValArr.add(r.getString("END"));
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        if(coursesValArr.size()>0){
+            for (int i = 0; i<coursesValArr.size(); i++) {
+                float beg1 = Float.parseFloat(coursesValArr.get(i));
+                int day = Integer.parseInt(coursesValArr.get(++i));
+                String lecturer1 = coursesValArr.get(++i);
+                String class1 = coursesValArr.get(++i);
+                String id1 = coursesValArr.get(++i);
+                float end1 = Float.parseFloat(coursesValArr.get(++i));
+                if(d == day && !sTableID.equals(id1)){
+                    if(lect.equals(lecturer1) || clas.equals(class1)){
+                        if((beggin>= beg1 && beggin<= end1) || (end >= beg1 && end<= end1)){
+                            return false;
+                        }
+                    }
+                }
+
+            }
+        }
+        return true;
+    }
     private static void updateCollage(String lid, String cid, String classnum, int day, float beginning) throws Exception {
         boolean test = false;
-        try {
+        conn.setAutoCommit(false);
+        boolean check;
+        float length = Float.parseFloat(sEnd) - Float.parseFloat(sBegin);
+        try{
             PreparedStatement search = conn.prepareStatement("SELECT * FROM LECTURERS_TABLE WHERE ID =?");
-            search.setString(1,lid);
+            search.setString(1, lid);
             ResultSet r = search.executeQuery();
             makeLectArr(r);
-            if(lValArr.size()>0) {
+            if (lValArr.size() > 0) {
                 search = conn.prepareStatement("SELECT * FROM CLASS_TABLE WHERE CLASS = ?");
-                search.setString(1,classnum);
+                search.setString(1, classnum);
                 r = search.executeQuery();
                 makeClassArr(r);
-                if(cValArr.size()>0) {
+                if (cValArr.size() > 0) {
                     search = conn.prepareStatement("SELECT * FROM COURSES_TABLE WHERE ID = ?");
-                    search.setString(1,cid);
+                    search.setString(1, cid);
                     r = search.executeQuery();
                     makeCourseArr(r);
-                    if(coursesValArr.size()>0) {
-                        float end = Float.parseFloat(coursesValArr.get(2));
-                        end += beginning;
-                        if (validateEnd(end)) {
-                            PreparedStatement updated = conn.prepareStatement("UPDATE COLLAGE_TABLE SET LECTURER_ID=?, COURSE_ID=?, CLASS=?, DAY=?, BEGINNING=?, END=? WHERE LECTURER_ID=? AND COURSE_ID=? AND CLASS=? AND DAY=? AND BEGINNING=?");
-                            updated.setString(1, lid);
-                            updated.setString(2, cid);
-                            updated.setString(3, classnum);
-                            updated.setInt(4, day);
-                            updated.setFloat(5, beginning);
-                            updated.setFloat(6, end);
-                            updated.setString(7, sLID);
-                            updated.setString(8, sCID);
-                            updated.setString(9, sCNUM);
-                            updated.setString(10, sDay);
-                            updated.setString(11, sBegin);
-                            long t = updated.executeLargeUpdate();
-                            if (t > 0) {
-                                System.out.println("row updated");
-                                test = true;
-                            } else
-                                System.out.println("something went wrong");
+                    if (coursesValArr.size() > 0) {
+                        float end1 = Float.parseFloat(coursesValArr.get(2));
+                        end1 += beginning;
+                        if (validateEnd(end1)) {
+                            search = conn.prepareStatement("SELECT BEGINNING, DAY, LECTURER_ID, CLASS, TABLE_ID, END FROM COLLAGE_TABLE WHERE DAY = ?");
+                            search.setInt(1,day);
+                            r = search.executeQuery();
+                            check = testHours(r,length,beginning,end1,lid,classnum,day);
+                            if(check) {
+                                PreparedStatement updated = conn.prepareStatement("UPDATE COLLAGE_TABLE SET LECTURER_ID=?, COURSE_ID=?, CLASS=?, DAY=?, BEGINNING=?, END=? WHERE LECTURER_ID=? AND COURSE_ID=? AND CLASS=? AND DAY=? AND BEGINNING=?");
+                                updated.setString(1, lid);
+                                updated.setString(2, cid);
+                                updated.setString(3, classnum);
+                                updated.setInt(4, day);
+                                updated.setFloat(5, beginning);
+                                updated.setFloat(6, end1);
+                                updated.setString(7, sLID);
+                                updated.setString(8, sCID);
+                                updated.setString(9, sCNUM);
+                                updated.setString(10, sDay);
+                                updated.setString(11, sBegin);
+                                long t = updated.executeLargeUpdate();
+                                if (t > 0) {
+                                    System.out.println("row updated");
+                                    test = true;
+                                } else
+                                    System.out.println("something went wrong");
+                            }
                         }
                     }
                 }
             }
         } catch (Exception e) {
-                e.printStackTrace();
+            conn.rollback();
+            e.printStackTrace();
+        }finally {
+            conn.setAutoCommit(true);
         }
         if (!test)
             System.out.println("please fix you new update data");
@@ -251,6 +348,8 @@ public class Collage extends JFrame {
                             sCNUM = clNum.getText();
                             sDay = day.getText();
                             sBegin = begin.getText();
+                            sEnd = valArr.get(5);
+                            sTableID = valArr.get(6);
                             System.out.println("record found");
                         } else
                             System.out.println("no record");
@@ -280,6 +379,12 @@ public class Collage extends JFrame {
                         e1.printStackTrace();
                     }
                     break;
+                case "s":
+                    try {
+                        CollageTable ct = new CollageTable(conn);
+                    } catch (SQLException e1) {
+                        e1.printStackTrace();
+                    }
             }
         }
     }
@@ -299,5 +404,19 @@ public class Collage extends JFrame {
     }
     private static boolean validateEnd(float e){
         return e <= 21 && e>= 8.5;
+    }
+
+    public boolean duplicatersDitection(String l,String c ,String cr,String d, String b ,String e) throws SQLException {
+        PreparedStatement search = conn.prepareStatement("SELECT * FROM COLLAGE_TABLE WHERE LECTURER_ID =? AND COURSE_ID =? AND CLASS = ? AND DAY=? AND BEGINNING=? AND =?");
+        search.setString(1,l);
+        search.setString(2,c);
+        search.setString(3,cr);
+        search.setString(4,d);
+        search.setString(5,b);search.setString(6,e);
+        long t = search.executeLargeUpdate();
+        if (t>0){
+            return true;
+        }
+        return false;
     }
 }

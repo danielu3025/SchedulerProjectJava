@@ -28,7 +28,7 @@ public class Lecturer  extends JFrame{
 
     public Lecturer(Connection con) throws HeadlessException, ParseException {
         lectConn = con;
-        id = new JTextField("",20);
+        id = new JTextField("",15);
         name = new JTextField("",20);
         lastName = new JTextField("",20);
         dob = new JTextField("",20);
@@ -43,10 +43,10 @@ public class Lecturer  extends JFrame{
         JButton TeachersPhons = new JButton("Teacher's Phons");
 
 
-        JLabel lbId = new JLabel(" id");
+        JLabel lbId = new JLabel(" id - 1-15#");
         JLabel lbName = new JLabel("first name");
         JLabel lbLastName = new JLabel("last name");
-        JLabel lbBod = new JLabel("birthday");
+        JLabel lbBod = new JLabel("birthday - dd/mm/yyyy 1940-2000");
         JLabel lbadresss = new JLabel("address name");
         JLabel lbphone = new JLabel("phone");
         age = new JLabel("Age:");
@@ -72,22 +72,22 @@ public class Lecturer  extends JFrame{
 
 
         setSize(500,500);
-        setTitle("com.sql.com.sql.Lecturer");
-        lbId.setBounds(30,10,100,20);
+        setTitle("Lecturer");
+        lbId.setBounds(30,10,150,20);
         id.setBounds(30,30,100,20);
 
-        lbName.setBounds(30,50,100,20);
+        lbName.setBounds(30,50,150,20);
         name.setBounds(30,80,100,20);
 
-        lbLastName.setBounds(30,110,100,20);
+        lbLastName.setBounds(30,110,150,20);
         lastName.setBounds(30,130,100,20);
 
-        lbBod.setBounds(30,160,100,20);
+        lbBod.setBounds(30,160,250,20);
         dob.setBounds(30,180,100,20);
         age.setBounds(140,180,100,20);
 
 
-        lbadresss.setBounds(30,210,100,20);
+        lbadresss.setBounds(30,210,200,20);
         address.setBounds(30,230,100,20);
 
         lbphone.setBounds(30,280,100,20);
@@ -98,9 +98,8 @@ public class Lecturer  extends JFrame{
         delete.setBounds(280,100,100,20);
         updateB.setBounds(280,130,100,20);
 
-        showPhons.setBounds(160,350,100,20);
-        showTeacher.setBounds(280,350,100,20);
-        TeachersPhons.setBounds(160,400,200,20);
+        showPhons.setBounds(160,350,200,20);
+        showTeacher.setBounds(160,380,200,20);
 
 
 
@@ -110,7 +109,7 @@ public class Lecturer  extends JFrame{
 
         add(id);add(name);add(lastName);add(dob);add(address);add(addB);add(search);add(delete);add(updateB);add(phone);
         add(lbId);add(lbName);add(lbLastName);add(lbBod);add(lbadresss);add(lbphone);add(age);
-        add(showPhons);add(showTeacher);add(TeachersPhons);
+        add(showPhons);add(showTeacher);
         setLayout(new BorderLayout());
         setResizable(false);
         setLayout(new FlowLayout());
@@ -127,6 +126,8 @@ public class Lecturer  extends JFrame{
             searchLect(id);
             if (lValArr.size()>0){
                 System.out.println("can't add existing lecturer");
+                JOptionPane.showMessageDialog(null, "can't add existing lecturer");
+
             } else {
                 lectConn.setAutoCommit(false);
                 try {
@@ -153,6 +154,8 @@ public class Lecturer  extends JFrame{
                     System.out.println("\n>> Transaction steps are ready.\n");
                     lectConn.commit();
                     System.out.println("lecturer added");
+                    JOptionPane.showMessageDialog(null, "lecturer added");
+
                 }catch (Exception e){
                     lectConn.rollback();
                     e.printStackTrace();
@@ -185,10 +188,16 @@ public class Lecturer  extends JFrame{
             long t = deleted.executeLargeUpdate();
             System.out.println("\n>> Transaction steps are ready.\n");
             lectConn.commit();
-            if (t>0)
+            if (t>0) {
                 System.out.println("row deleted");
-            else
+                JOptionPane.showMessageDialog(null, "lecturer added");
+
+            }
+            else{
                 System.out.println("row didn't found");
+                JOptionPane.showMessageDialog(null, "row didn't found");
+            }
+
         }catch (Exception e){
             e.printStackTrace();
             lectConn.rollback();
@@ -248,10 +257,15 @@ public class Lecturer  extends JFrame{
             long t = updated.executeLargeUpdate();
             System.out.println("prepared to commit");
             lectConn.commit();
-            if (t>0)
+            if (t>0) {
                 System.out.println("row updated");
-            else
+                JOptionPane.showMessageDialog(null, "row updated");
+
+            }
+            else {
                 System.out.println("row didn't found");
+                JOptionPane.showMessageDialog(null, "row didn't found");
+            }
 
         }catch(Exception e){
             e.printStackTrace();
@@ -273,7 +287,8 @@ public class Lecturer  extends JFrame{
                             addLect(i, n, lN, bd, add,ph);
                             clear();
                         }else
-                            System.out.println("please fix inputs");
+                        JOptionPane.showMessageDialog(null, "please fix inputs");
+
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
@@ -289,11 +304,11 @@ public class Lecturer  extends JFrame{
                                 dob.setText(lValArr.get(3));
                                 address.setText(lValArr.get(4));
                                 age.setText("Age: " +  lValArr.get(5));
-                                System.out.println("filled all records");
+                                JOptionPane.showMessageDialog(null,"filled all records");
                             } else
-                                System.out.println("no record");
+                                JOptionPane.showMessageDialog(null,"no record");
                         } else
-                            System.out.println("please fix inputs");
+                            JOptionPane.showMessageDialog(null,"please fix inputs");
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
@@ -304,7 +319,7 @@ public class Lecturer  extends JFrame{
                             deleteLect(i);
                             clear();
                         }else
-                            System.out.println("please fix inputs");
+                            JOptionPane.showMessageDialog(null,"please fix inputs");
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
@@ -315,14 +330,14 @@ public class Lecturer  extends JFrame{
                             updateLect(i, n, lN, bd, add,ph);
                             clear();
                         } else
-                            System.out.println("please fix inputs");
+                            JOptionPane.showMessageDialog(null,"please fix inputs");
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
                     break;
                 case "showPhons":
                     try {
-                        PhoneTable p = new PhoneTable(lectConn);
+                        LectPhones tp = new LectPhones(lectConn);
                     } catch (SQLException e1) {
                         e1.printStackTrace();
                     }
@@ -333,15 +348,8 @@ public class Lecturer  extends JFrame{
                     } catch (SQLException e1) {
                         e1.printStackTrace();
                     }
+                    break;
 
-                    break;
-                case "TP":
-                    try {
-                        LectPhones tp = new LectPhones(lectConn);
-                    } catch (SQLException e1) {
-                        e1.printStackTrace();
-                    }
-                    break;
             }
         }
     }
@@ -358,7 +366,7 @@ public class Lecturer  extends JFrame{
             m = Integer.parseInt(months);
             years = dob.substring(6,10);
             y = Integer.parseInt(years);
-            return d>0 && d<32 && m>0 && m<13 && y > 1900 && y < 2000;
+            return d>0 && d<32 && m>0 && m<13 && y > 1940 && y < 2000;
         } else
             return false;
     }
