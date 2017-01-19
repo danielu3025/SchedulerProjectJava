@@ -190,7 +190,7 @@ public class Lecturer  extends JFrame{
             lectConn.commit();
             if (t>0) {
                 System.out.println("row deleted");
-                JOptionPane.showMessageDialog(null, "lecturer added");
+                JOptionPane.showMessageDialog(null, "lecturer deleted");
 
             }
             else{
